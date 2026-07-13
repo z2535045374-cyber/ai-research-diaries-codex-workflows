@@ -1,0 +1,10 @@
+{
+  "briefing_label": "Research supervision workspace",
+  "group_labels": {
+    "discussion": "Questions and decisions"
+  },
+  "theme": {
+    "accent": "#174f73",
+    "highlight": "#8a4f08"
+  }
+}

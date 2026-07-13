@@ -1,0 +1,25 @@
+{
+  "project_title": "Urban heat, mobility and community health evidence synthesis",
+  "recent_progress": [
+    "Mapped environmental exposure measures to public health outcomes across the selected studies.",
+    "Revised the comparison framework to distinguish observational and modelling evidence."
+  ],
+  "completed_work": [
+    "Completed a sanitised evidence table covering climate, transport and health sources."
+  ],
+  "key_findings": [
+    "Studies use inconsistent spatial units, limiting direct comparison of heat and mobility measures."
+  ],
+  "unresolved_questions": [
+    "Should the synthesis prioritise neighbourhood-scale comparability or retain study-specific spatial detail?"
+  ],
+  "decisions_required": [
+    "Confirm the spatial scale to use in the next comparison table."
+  ],
+  "next_actions": [
+    "Revise the methods note to document the selected spatial harmonisation rule."
+  ],
+  "timeline": [
+    "Late August — complete the revised cross-disciplinary synthesis."
+  ]
+}

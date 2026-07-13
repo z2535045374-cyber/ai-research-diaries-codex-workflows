@@ -4,41 +4,102 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="data:,">
   <title>Page not found | AI Research Diaries</title>
   <style>
-    :root { color-scheme: light; }
-    * { box-sizing: border-box; }
+    :root {
+      color-scheme: light;
+      --navy: #071e2f;
+      --teal: #0b6f6d;
+      --amber: #8a5200;
+      --ink: #172532;
+      --paper: #fffdf8;
+      --line: #c7d2d2;
+      --display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --body: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       display: grid;
       min-height: 100vh;
       margin: 0;
-      padding: 1.5rem;
-      place-items: center;
-      background: #f1f5f3;
-      color: #172532;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.6;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 1rem;
+      line-height: 1.65;
     }
     main {
-      width: min(100%, 38rem);
-      padding: clamp(2rem, 7vw, 4rem);
-      border-top: 0.4rem solid #d79a2b;
-      border-radius: 1rem;
-      background: #fffdf8;
-      box-shadow: 0 1.25rem 3.5rem rgba(7, 30, 47, 0.11);
+      display: grid;
+      width: min(100% - 2rem, 64rem);
+      margin: auto;
+      grid-template-columns: 7rem minmax(0, 1fr);
+      gap: clamp(2rem, 7vw, 6rem);
+      padding-block: 4rem;
+      border-top: 2px solid var(--amber);
+      border-bottom: 1px solid var(--line);
     }
-    h1 { margin-top: 0; color: #0b2940; font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1.05; }
-    a { color: #0b6f6d; font-weight: 750; text-underline-offset: 0.2em; }
-    a:focus-visible { outline: 0.2rem solid #d79a2b; outline-offset: 0.25rem; }
+    .folio {
+      color: var(--teal);
+      font-family: var(--display);
+      font-size: clamp(3rem, 9vw, 6rem);
+      font-weight: 700;
+      line-height: 0.85;
+    }
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-family: var(--display);
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      letter-spacing: -0.045em;
+      line-height: 0.95;
+      text-wrap: balance;
+    }
+    p { max-width: 58ch; text-wrap: pretty; }
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      color: var(--teal);
+      font-weight: 750;
+      text-underline-offset: 0.2em;
+    }
+    a:focus-visible {
+      outline: 0.2rem solid #ffffff;
+      outline-offset: 0.12rem;
+      box-shadow: 0 0 0 0.42rem #000000;
+    }
+    footer {
+      width: min(100% - 2rem, 64rem);
+      margin: 0 auto auto;
+      padding-block: 1.5rem 3rem;
+      color: #536675;
+      font-size: 1rem;
+    }
+    footer p { max-width: 72ch; margin: 0; }
+    .licences { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.5rem; }
+    @media (max-width: 560px) {
+      main { grid-template-columns: 1fr; gap: 1.5rem; }
+      .folio { font-size: 3rem; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <p>404</p>
-    <h1>Page not found</h1>
-    <p>The page you requested is not available.</p>
-    <p><a href="./">Return to the AI Research Diaries homepage</a></p>
+    <div class="folio" aria-hidden="true">404</div>
+    <div>
+      <h1>Page not found</h1>
+      <p>The page you requested is not available.</p>
+      <p><a href="https://z2535045374-cyber.github.io/ai-research-diaries-codex-workflows/">Return to the AI Research Diaries homepage</a></p>
+    </div>
   </main>
+  <footer>
+    <p>Personal HDR workflow contribution by Poming Zhang. This is not an official UWA or OpenAI guide and does not imply their endorsement or affiliation.</p>
+    <div class="licences">
+      <a href="https://z2535045374-cyber.github.io/ai-research-diaries-codex-workflows/LICENSE">MIT software licence</a>
+      <a href="https://z2535045374-cyber.github.io/ai-research-diaries-codex-workflows/CONTENT-LICENSE.md">CC BY 4.0 content licence</a>
+    </div>
+  </footer>
 </body>
 </html>

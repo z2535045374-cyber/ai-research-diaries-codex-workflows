@@ -1,0 +1,4 @@
+interface:
+  display_name: "Supervisor Meeting Workspace"
+  short_description: "Build confidential offline meeting workspaces"
+  default_prompt: "Use $research-briefing-dashboard to turn my approved research meeting notes into a confidential offline supervisor meeting workspace."

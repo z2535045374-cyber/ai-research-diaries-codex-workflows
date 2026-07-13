@@ -1,0 +1,26 @@
+{
+  "briefing_label": "Supervisor meeting briefing",
+  "group_order": [
+    "overview",
+    "progress_evidence",
+    "discussion",
+    "actions_timeline"
+  ],
+  "group_labels": {
+    "overview": "Overview",
+    "progress_evidence": "Progress and evidence",
+    "discussion": "Discussion workspace",
+    "actions_timeline": "Actions and timeline"
+  },
+  "theme": {
+    "accent": "#0f5c5e",
+    "highlight": "#b56a00"
+  },
+  "features": {
+    "search": true,
+    "counts": true,
+    "collapse_controls": true,
+    "meeting_state": true,
+    "print": true
+  }
+}

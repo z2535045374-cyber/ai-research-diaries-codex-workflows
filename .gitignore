@@ -1,0 +1,35 @@
+.DS_Store
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated temporary outputs
+.tmp/
+tmp/
+*.tmp
+*.tmp.html
+*.generated.html
+build/
+dist/
+
+# Exported meeting state
+supervisor-meeting-state.json
+*-meeting-state.json
+meeting-state-*.json
+*.meeting-state.json
+
+# Browser artefacts
+.playwright-cli/
+test-results/
+playwright-report/
+blob-report/
+screenshots/
+*.trace.zip
+*.webm
+
+# Private planning and review artefacts
+.superpowers/

@@ -1,0 +1,69 @@
+name: Validate publication
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Run standard-library unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover \
+            -s research-briefing-dashboard/tests \
+            -p 'test_*.py' \
+            -v
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_*.py' \
+            -v
+
+      - name: Verify that the downloadable Skill is reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$(mktemp)"
+          extraction="$(mktemp -d)"
+          trap 'rm -f "$archive"; rm -rf "$extraction"' EXIT
+          python3 scripts/package_skill.py "$archive"
+          cmp "$archive" Supervisor_Meeting_HTML_Skill.zip
+          python3 -m zipfile -t "$archive"
+          python3 -m zipfile -e "$archive" "$extraction"
+          python3 -m unittest discover \
+            -s "$extraction/research-briefing-dashboard/tests" \
+            -p 'test_*.py' \
+            -v
+
+      - name: Rebuild default and configured examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          temporary_directory="$(mktemp -d)"
+          trap 'rm -rf "$temporary_directory"' EXIT
+          python3 research-briefing-dashboard/scripts/build_briefing.py \
+            research-briefing-dashboard/examples/meeting_brief.json \
+            "$temporary_directory/default.html"
+          python3 research-briefing-dashboard/scripts/build_briefing.py \
+            research-briefing-dashboard/examples/meeting_brief.json \
+            "$temporary_directory/configured.html" \
+            --config research-briefing-dashboard/examples/briefing_config.json
+          cmp \
+            "$temporary_directory/configured.html" \
+            research-briefing-dashboard/examples/meeting_brief.html
+          python3 scripts/validate_publication.py \
+            "$temporary_directory/default.html" \
+            "$temporary_directory/configured.html"

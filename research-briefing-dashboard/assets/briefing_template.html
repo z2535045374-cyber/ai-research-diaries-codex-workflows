@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>{{PROJECT_TITLE}} — {{BRIEFING_LABEL}}</title>
+  <script>document.documentElement.classList.add("js")</script>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #526070;
+      --paper: #ffffff;
+      --page: #edf2f4;
+      --panel: #f7f9fa;
+      --accent: {{ACCENT}};
+      --accent-foreground: {{ACCENT_FOREGROUND}};
+      --accent-on-surface: {{ACCENT_ON_SURFACE}};
+      --highlight: {{HIGHLIGHT}};
+      --highlight-foreground: {{HIGHLIGHT_FOREGROUND}};
+      --highlight-on-surface: {{HIGHLIGHT_ON_SURFACE}};
+      --focus-inner: #ffffff;
+      --focus-outer: #000000;
+      --border: #c8d2d8;
+      --shadow: 0 0.4rem 1.4rem rgba(23, 32, 51, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--page);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    body {
+      min-width: 18rem;
+      margin: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      color: inherit;
+      font: inherit;
+    }
+
+    button,
+    .button-label {
+      min-height: 2.65rem;
+      padding: 0.58rem 0.85rem;
+      border: 1px solid var(--accent-on-surface);
+      border-radius: 0.4rem;
+      background: var(--paper);
+      color: var(--accent-on-surface);
+      cursor: pointer;
+      font-weight: 750;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    button:hover,
+    .button-label:hover {
+      box-shadow: inset 0 0 0 0.12rem var(--accent-on-surface);
+    }
+
+    .emphasised-control {
+      background: var(--accent);
+      color: var(--accent-foreground);
+    }
+
+    #reset-state {
+      border-color: var(--highlight-on-surface);
+      background: var(--highlight);
+      color: var(--highlight-foreground);
+    }
+
+    :focus-visible {
+      outline: 0.2rem solid var(--focus-inner);
+      outline-offset: 0.12rem;
+      box-shadow: 0 0 0 0.4rem var(--focus-outer);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 0.5rem;
+      left: 0.5rem;
+      padding: 0.7rem 0.9rem;
+      transform: translateY(-170%);
+      border-radius: 0.35rem;
+      background: var(--highlight);
+      color: var(--highlight-foreground);
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .masthead {
+      padding: 2.25rem clamp(1.2rem, 4vw, 3.2rem);
+      background: var(--accent);
+      color: var(--accent-foreground);
+    }
+
+    .kicker {
+      margin: 0 0 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .project-title {
+      max-width: 62rem;
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: clamp(2rem, 5vw, 3.75rem);
+      line-height: 1.08;
+      white-space: pre-wrap;
+    }
+
+    .mobile-nav {
+      display: none;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .mobile-nav label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 800;
+    }
+
+    .mobile-nav select {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      background: var(--paper);
+    }
+
+    .workspace-tools {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 0.8rem 1rem;
+      padding: 1rem clamp(1rem, 3vw, 2rem);
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    html:not(.js) .workspace-tools {
+      display: none;
+    }
+
+    .search-control {
+      flex: 1 1 18rem;
+    }
+
+    .search-control label,
+    .note-field label,
+    .select-field label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 750;
+    }
+
+    .search-control input,
+    .note-field textarea,
+    .select-field select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      background: var(--paper);
+    }
+
+    .search-control input,
+    .select-field select {
+      min-height: 2.65rem;
+      padding: 0.5rem 0.65rem;
+    }
+
+    .workspace-button-group {
+      display: flex;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .state-button-group {
+      flex-basis: 100%;
+    }
+
+    #import-state {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    #import-state:focus-visible + * {
+      outline: 0.2rem solid var(--focus-inner);
+      outline-offset: 0.12rem;
+      box-shadow: 0 0 0 0.4rem var(--focus-outer);
+    }
+
+    .state-confidentiality-warning {
+      flex: 1 1 100%;
+      margin: 0.2rem 0 0;
+      padding: 0.65rem 0.75rem;
+      border-left: 0.22rem solid var(--highlight-on-surface);
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .state-message {
+      flex: 1 1 16rem;
+      min-height: 1.5em;
+      margin: 0;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .state-message[data-kind="error"] {
+      color: #8b1e1e;
+    }
+
+    .page-shell {
+      width: min(90rem, calc(100% - 2rem));
+      margin: 1.5rem auto;
+      overflow: clip;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .workspace-layout {
+      display: grid;
+      grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+      min-height: 40rem;
+    }
+
+    .workspace-navigation {
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .sidebar-nav {
+      position: sticky;
+      top: 0;
+      padding: 1.4rem 1rem;
+    }
+
+    .sidebar-nav h2 {
+      margin: 0 0 0.8rem;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .sidebar-nav li + li {
+      margin-top: 0.35rem;
+    }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 0.55rem 0.65rem;
+      border-left: 0.2rem solid transparent;
+      border-radius: 0.2rem;
+      color: var(--ink);
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a[aria-current="location"] {
+      border-left-color: var(--accent-on-surface);
+      background: var(--paper);
+      color: var(--accent-on-surface);
+    }
+
+    main {
+      min-width: 0;
+      padding: clamp(1rem, 3vw, 2rem);
+    }
+
+    .workspace-group {
+      scroll-margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      background: var(--paper);
+    }
+
+    .workspace-group + .workspace-group {
+      margin-top: 1rem;
+    }
+
+    .workspace-group > summary {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      list-style: none;
+      background: var(--panel);
+    }
+
+    .workspace-group > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .workspace-group > summary h2 {
+      margin: 0;
+      color: var(--accent-on-surface);
+      font-size: 1.18rem;
+      line-height: 1.3;
+    }
+
+    .summary-marker {
+      width: 0.7rem;
+      height: 0.7rem;
+      flex: 0 0 auto;
+      transform: rotate(-45deg);
+      border-right: 0.15rem solid var(--accent-on-surface);
+      border-bottom: 0.15rem solid var(--accent-on-surface);
+    }
+
+    .workspace-group[open] .summary-marker {
+      transform: rotate(45deg);
+    }
+
+    .group-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .section-card,
+    .overview-counts {
+      min-width: 0;
+      break-inside: avoid;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-top: 0.25rem solid var(--accent-on-surface);
+      border-radius: 0.45rem;
+      background: var(--paper);
+    }
+
+    .section-card h3,
+    .overview-counts h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .overview-counts {
+      grid-column: 1 / -1;
+    }
+
+    .overview-counts dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+      gap: 0.65rem;
+      margin: 0;
+    }
+
+    .count-card {
+      display: flex;
+      flex-direction: column-reverse;
+      padding: 0.75rem;
+      border-radius: 0.35rem;
+      background: var(--panel);
+    }
+
+    .count-card dt {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .count-card dd {
+      margin: 0;
+      color: var(--accent-on-surface);
+      font-size: 1.6rem;
+      font-weight: 850;
+      line-height: 1.15;
+    }
+
+    .item-list {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+
+    .item-list > li {
+      padding-left: 0.15rem;
+      overflow-wrap: anywhere;
+    }
+
+    .item-list > li + li {
+      margin-top: 0.65rem;
+    }
+
+    .item-list > li::marker {
+      color: var(--accent-on-surface);
+      font-weight: 800;
+    }
+
+    .source-text {
+      white-space: pre-wrap;
+    }
+
+    p.source-text {
+      margin: 0;
+    }
+
+    .meeting-list {
+      padding-left: 1.6rem;
+    }
+
+    .meeting-item-controls {
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 0.65rem;
+      padding: 0.75rem;
+      border-left: 0.22rem solid var(--accent-on-surface);
+      border-radius: 0.25rem;
+      background: var(--panel);
+    }
+
+    .status-field {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .status-field input[type="checkbox"] {
+      width: 1.15rem;
+      height: 1.15rem;
+      accent-color: var(--accent-on-surface);
+    }
+
+    .status-field label {
+      font-weight: 750;
+    }
+
+    .select-field {
+      display: block;
+    }
+
+    .note-field textarea {
+      min-height: 5rem;
+      padding: 0.55rem;
+      resize: vertical;
+    }
+
+    .print-state {
+      display: none;
+      margin: 0.55rem 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      white-space: pre-wrap;
+    }
+
+    .empty-state,
+    .no-script-message {
+      margin: 0;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .no-script-message {
+      padding: 0.8rem clamp(1rem, 3vw, 2rem);
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .document-footer {
+      padding: 1rem clamp(1rem, 3vw, 2rem);
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .document-footer p {
+      margin: 0;
+    }
+
+    @media (max-width: 50rem) {
+      .page-shell {
+        width: min(100% - 0.75rem, 90rem);
+        margin: 0.4rem auto;
+        border-radius: 0.4rem;
+      }
+
+      .mobile-nav {
+        display: block;
+      }
+
+      .workspace-layout {
+        display: block;
+        min-height: 0;
+      }
+
+      .workspace-navigation {
+        display: none;
+      }
+
+      .group-body {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-counts {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 34rem) {
+      .workspace-tools,
+      .workspace-button-group {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search-control {
+        flex: 0 0 auto;
+        width: 100%;
+      }
+
+      .state-confidentiality-warning,
+      .state-message {
+        flex: 0 0 auto;
+        width: 100%;
+      }
+
+      .workspace-button-group,
+      .workspace-button-group > * {
+        width: 100%;
+      }
+
+      .state-message {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    @media print {
+      html,
+      body {
+        background: #ffffff;
+      }
+
+      .skip-link,
+      .mobile-nav,
+      .workspace-tools,
+      .workspace-navigation,
+      .no-script-message {
+        display: none !important;
+      }
+
+      .page-shell {
+        width: 100%;
+        margin: 0;
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .masthead,
+      main,
+      .document-footer {
+        padding-right: 0;
+        padding-left: 0;
+      }
+
+      .workspace-layout {
+        display: block;
+        min-height: 0;
+      }
+
+      .workspace-group,
+      .section-card,
+      .overview-counts {
+        break-inside: avoid;
+      }
+
+      .workspace-group:not([open]) > *:not(summary) {
+        display: block !important;
+      }
+
+      .group-body {
+        padding-right: 0;
+        padding-left: 0;
+      }
+
+      html.js .meeting-item-controls {
+        display: none;
+      }
+
+      html.js .print-state {
+        display: block;
+      }
+
+      .masthead,
+      .section-card,
+      .overview-counts {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body data-brief-id="{{BRIEF_ID}}">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div class="page-shell">
+    <header class="masthead">
+      <p class="kicker">{{BRIEFING_LABEL}}</p>
+      <h1 class="project-title">{{PROJECT_TITLE}}</h1>
+    </header>
+
+    {{MOBILE_NAVIGATION}}
+    {{WORKSPACE_CONTROLS}}
+    <noscript>
+      <p class="no-script-message">Interactive tools require JavaScript; all supplied research content remains available below.</p>
+    </noscript>
+
+    <div class="workspace-layout">
+      <aside class="workspace-navigation">
+{{DESKTOP_NAVIGATION}}
+      </aside>
+
+      <main id="main-content" tabindex="-1">
+{{GROUPS}}
+      </main>
+    </div>
+
+    <footer class="document-footer">
+      <p>This self-contained briefing works offline and was generated from supplied notes only.</p>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SCHEMA_VERSION = 1;
+      const MAX_IMPORT_BYTES = 262144;
+      const MAX_NOTE_CODE_POINTS = 5000;
+      const STATE_FILENAME = "supervisor-meeting-state.json";
+      const BRIEF_ID = "{{BRIEF_ID}}";
+      const FEATURES = {{FEATURES_JSON}};
+      const EXPECTED_IDS = {{STATE_IDS_JSON}};
+      const DECISION_STATUSES = ["pending", "agreed", "deferred"];
+      const groups = Array.from(document.querySelectorAll(".workspace-group"));
+      const navigationLinks = Array.from(document.querySelectorAll("[data-nav-group]"));
+      const mobileNavigation = document.getElementById("mobile-group-nav");
+      let printOpenState = [];
+
+      function activateNavigation(identifier) {
+        navigationLinks.forEach((link) => {
+          if (link.dataset.navGroup === identifier) {
+            link.setAttribute("aria-current", "location");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+        if (mobileNavigation) {
+          mobileNavigation.value = identifier;
+        }
+      }
+
+      function initialiseNavigation() {
+        if (groups.length === 0) {
+          return;
+        }
+        activateNavigation(groups[0].dataset.group);
+        navigationLinks.forEach((link) => {
+          link.addEventListener("click", () => activateNavigation(link.dataset.navGroup));
+        });
+        if (mobileNavigation) {
+          mobileNavigation.addEventListener("change", () => {
+            const target = document.getElementById("group-" + mobileNavigation.value);
+            if (target) {
+              target.open = true;
+              target.scrollIntoView({block: "start"});
+              target.querySelector("summary").focus();
+              activateNavigation(target.dataset.group);
+            }
+          });
+        }
+        if ("IntersectionObserver" in window) {
+          const observer = new IntersectionObserver((entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((first, second) => second.intersectionRatio - first.intersectionRatio);
+            if (visible.length > 0) {
+              activateNavigation(visible[0].target.dataset.group);
+            }
+          }, {rootMargin: "-15% 0px -65% 0px", threshold: [0, 0.1, 0.5]});
+          groups.forEach((group) => observer.observe(group));
+        }
+      }
+
+      function initialiseSearch() {
+        const search = document.getElementById("workspace-search");
+        if (!FEATURES.search || !search) {
+          return;
+        }
+        search.addEventListener("input", () => {
+          const query = search.value.trim().toLocaleLowerCase("en-GB");
+          document.querySelectorAll(".section-card").forEach((card) => {
+            const items = Array.from(card.querySelectorAll(".item-list > li"));
+            let matchedItems = 0;
+            items.forEach((item) => {
+              const matches = !query || item.textContent.toLocaleLowerCase("en-GB").includes(query);
+              item.hidden = !matches;
+              if (matches) {
+                matchedItems += 1;
+              }
+            });
+            const headingMatches = card.querySelector("h3").textContent
+              .toLocaleLowerCase("en-GB").includes(query);
+            const hasEmptyMessage = card.querySelector(".empty-state") !== null;
+            card.hidden = Boolean(query) && !headingMatches && matchedItems === 0 && !hasEmptyMessage;
+            if (!card.hidden && query) {
+              card.closest("details").open = true;
+            }
+          });
+        });
+      }
+
+      function initialiseDisplayControls() {
+        const expand = document.getElementById("expand-all");
+        const collapse = document.getElementById("collapse-all");
+        const printButton = document.getElementById("print-briefing");
+        if (expand) {
+          expand.addEventListener("click", () => groups.forEach((group) => { group.open = true; }));
+        }
+        if (collapse) {
+          collapse.addEventListener("click", () => groups.forEach((group) => { group.open = false; }));
+        }
+        if (printButton) {
+          printButton.addEventListener("click", () => window.print());
+        }
+      }
+
+      function isPlainObject(value) {
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+      }
+
+      function assertExactKeys(value, expectedKeys, label) {
+        if (!isPlainObject(value)) {
+          throw new Error(label + " must be an object.");
+        }
+        const actual = Object.keys(value).sort();
+        const expected = expectedKeys.slice().sort();
+        if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) {
+          throw new Error(label + " has missing or unknown keys.");
+        }
+      }
+
+      function validateNote(note, label) {
+        if (typeof note !== "string") {
+          throw new Error(label + " must be text.");
+        }
+        if (Array.from(note).length > MAX_NOTE_CODE_POINTS) {
+          throw new Error(label + " exceeds 5000 Unicode code points.");
+        }
+        return note;
+      }
+
+      function validateStateCollection(collection, expectedIds, kind) {
+        assertExactKeys(collection, expectedIds, kind + " collection");
+        const validated = {};
+        expectedIds.forEach((itemId) => {
+          const item = collection[itemId];
+          if (kind === "questions") {
+            assertExactKeys(item, ["discussed", "note"], itemId);
+            if (typeof item.discussed !== "boolean") {
+              throw new Error(itemId + ".discussed must be a boolean.");
+            }
+            validated[itemId] = {"discussed": item.discussed, "note": validateNote(item.note, itemId + ".note")};
+          } else if (kind === "decisions") {
+            assertExactKeys(item, ["status", "note"], itemId);
+            if (typeof item.status !== "string" || !DECISION_STATUSES.includes(item.status)) {
+              throw new Error(itemId + ".status is invalid.");
+            }
+            validated[itemId] = {"status": item.status, "note": validateNote(item.note, itemId + ".note")};
+          } else {
+            assertExactKeys(item, ["completed", "note"], itemId);
+            if (typeof item.completed !== "boolean") {
+              throw new Error(itemId + ".completed must be a boolean.");
+            }
+            validated[itemId] = {"completed": item.completed, "note": validateNote(item.note, itemId + ".note")};
+          }
+        });
+        return validated;
+      }
+
+      function validateImportedState(candidate) {
+        assertExactKeys(
+          candidate,
+          ["schema_version", "brief_id", "exported_at", "questions", "decisions", "actions"],
+          "Meeting state"
+        );
+        if (candidate["schema_version"] !== SCHEMA_VERSION) {
+          throw new Error("The meeting state schema version is not supported.");
+        }
+        if (candidate["brief_id"] !== BRIEF_ID) {
+          throw new Error("This meeting state belongs to a different briefing.");
+        }
+        if (
+          typeof candidate["exported_at"] !== "string" ||
+          !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(candidate["exported_at"]) ||
+          Number.isNaN(Date.parse(candidate["exported_at"]))
+        ) {
+          throw new Error("exported_at must be a valid ISO-8601 date and time.");
+        }
+        return {
+          "schema_version": SCHEMA_VERSION,
+          "brief_id": BRIEF_ID,
+          "exported_at": candidate["exported_at"],
+          "questions": validateStateCollection(candidate["questions"], EXPECTED_IDS.questions, "questions"),
+          "decisions": validateStateCollection(candidate["decisions"], EXPECTED_IDS.decisions, "decisions"),
+          "actions": validateStateCollection(candidate["actions"], EXPECTED_IDS.actions, "actions")
+        };
+      }
+
+      function findMeetingItem(itemId) {
+        return Array.from(document.querySelectorAll("[data-state-id]")).find(
+          (item) => item.dataset.stateId === itemId
+        );
+      }
+
+      function updatePrintState(item) {
+        const kind = item.dataset.stateKind;
+        const note = item.querySelector('[data-state-control="note"]').value;
+        let statusText = "";
+        if (kind === "question") {
+          statusText = "Discussed: " + (item.querySelector('[data-state-control="discussed"]').checked ? "Yes" : "No");
+        } else if (kind === "decision") {
+          const select = item.querySelector('[data-state-control="status"]');
+          statusText = "Decision status: " + select.options[select.selectedIndex].text;
+        } else {
+          statusText = "Completed: " + (item.querySelector('[data-state-control="completed"]').checked ? "Yes" : "No");
+        }
+        item.querySelector(".print-state").textContent = statusText + ". Meeting note: " + (note || "No note supplied.");
+      }
+
+      function updateAllPrintStates() {
+        document.querySelectorAll("[data-state-id]").forEach(updatePrintState);
+      }
+
+      function collectMeetingState() {
+        const state = {
+          "schema_version": SCHEMA_VERSION,
+          "brief_id": BRIEF_ID,
+          "exported_at": new Date().toISOString(),
+          "questions": {},
+          "decisions": {},
+          "actions": {}
+        };
+        EXPECTED_IDS.questions.forEach((itemId) => {
+          const item = findMeetingItem(itemId);
+          state["questions"][itemId] = {
+            "discussed": item.querySelector('[data-state-control="discussed"]').checked,
+            "note": item.querySelector('[data-state-control="note"]').value
+          };
+        });
+        EXPECTED_IDS.decisions.forEach((itemId) => {
+          const item = findMeetingItem(itemId);
+          state["decisions"][itemId] = {
+            "status": item.querySelector('[data-state-control="status"]').value,
+            "note": item.querySelector('[data-state-control="note"]').value
+          };
+        });
+        EXPECTED_IDS.actions.forEach((itemId) => {
+          const item = findMeetingItem(itemId);
+          state["actions"][itemId] = {
+            "completed": item.querySelector('[data-state-control="completed"]').checked,
+            "note": item.querySelector('[data-state-control="note"]').value
+          };
+        });
+        return state;
+      }
+
+      function applyMeetingState(state) {
+        Object.entries(state["questions"]).forEach(([itemId, value]) => {
+          const item = findMeetingItem(itemId);
+          item.querySelector('[data-state-control="discussed"]').checked = value.discussed;
+          item.querySelector('[data-state-control="note"]').value = value.note;
+        });
+        Object.entries(state["decisions"]).forEach(([itemId, value]) => {
+          const item = findMeetingItem(itemId);
+          item.querySelector('[data-state-control="status"]').value = value.status;
+          item.querySelector('[data-state-control="note"]').value = value.note;
+        });
+        Object.entries(state["actions"]).forEach(([itemId, value]) => {
+          const item = findMeetingItem(itemId);
+          item.querySelector('[data-state-control="completed"]').checked = value.completed;
+          item.querySelector('[data-state-control="note"]').value = value.note;
+        });
+        updateAllPrintStates();
+      }
+
+      function emptyMeetingState() {
+        const state = {
+          "schema_version": SCHEMA_VERSION,
+          "brief_id": BRIEF_ID,
+          "exported_at": new Date().toISOString(),
+          "questions": {},
+          "decisions": {},
+          "actions": {}
+        };
+        EXPECTED_IDS.questions.forEach((itemId) => { state["questions"][itemId] = {"discussed": false, "note": ""}; });
+        EXPECTED_IDS.decisions.forEach((itemId) => { state["decisions"][itemId] = {"status": "pending", "note": ""}; });
+        EXPECTED_IDS.actions.forEach((itemId) => { state["actions"][itemId] = {"completed": false, "note": ""}; });
+        return state;
+      }
+
+      function showStateMessage(text, isError) {
+        const message = document.getElementById("state-message");
+        if (!message) {
+          return;
+        }
+        message.textContent = text;
+        message.dataset.kind = isError ? "error" : "success";
+        if (isError) {
+          message.setAttribute("role", "alert")
+          message.setAttribute("aria-live", "assertive");
+        } else {
+          message.setAttribute("role", "status");
+          message.setAttribute("aria-live", "polite");
+        }
+      }
+
+      function exportMeetingState() {
+        const contents = JSON.stringify(collectMeetingState(), null, 2) + "\n";
+        const blob = new Blob([contents], {type: "application/json"});
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = STATE_FILENAME;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(downloadUrl);
+        showStateMessage("Meeting state exported.", false);
+      }
+
+      async function importMeetingState(file) {
+        if (file.size > MAX_IMPORT_BYTES) {
+          throw new Error("The meeting state file exceeds 262144 bytes.");
+        }
+        const rawText = await file.text();
+        let candidate;
+        try {
+          candidate = JSON.parse(rawText);
+        } catch (error) {
+          throw new Error("The meeting state file is not valid JSON.");
+        }
+        const validatedState = validateImportedState(candidate);
+        applyMeetingState(validatedState);
+      }
+
+      function initialiseMeetingState() {
+        if (!FEATURES.meeting_state) {
+          return;
+        }
+        const exportButton = document.getElementById("export-state");
+        const importInput = document.getElementById("import-state");
+        const resetButton = document.getElementById("reset-state");
+        document.querySelectorAll("[data-state-control]").forEach((control) => {
+          control.addEventListener("input", () => updatePrintState(control.closest("[data-state-id]")));
+          control.addEventListener("change", () => updatePrintState(control.closest("[data-state-id]")));
+        });
+        exportButton.addEventListener("click", exportMeetingState);
+        importInput.addEventListener("change", async () => {
+          const file = importInput.files[0];
+          if (!file) {
+            return;
+          }
+          try {
+            await importMeetingState(file);
+            showStateMessage("Meeting state imported.", false);
+          } catch (error) {
+            showStateMessage(error instanceof Error ? error.message : "The meeting state could not be imported.", true);
+          } finally {
+            importInput.value = "";
+          }
+        });
+        resetButton.addEventListener("click", () => {
+          applyMeetingState(emptyMeetingState());
+          showStateMessage("Meeting state reset.", false);
+        });
+        updateAllPrintStates();
+      }
+
+      window.addEventListener("beforeprint", () => {
+        printOpenState = groups.map((group) => group.open);
+        groups.forEach((group) => { group.open = true; });
+        updateAllPrintStates();
+      });
+
+      window.addEventListener("afterprint", () => {
+        groups.forEach((group, index) => { group.open = printOpenState[index]; });
+      });
+
+      initialiseNavigation();
+      initialiseSearch();
+      initialiseDisplayControls();
+      initialiseMeetingState();
+    })();
+  </script>
+</body>
+</html>
