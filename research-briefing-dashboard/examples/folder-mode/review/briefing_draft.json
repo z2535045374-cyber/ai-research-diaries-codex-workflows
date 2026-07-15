@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "mode": "research_folder",
+  "context": {
+    "source_label": "sources",
+    "reporting_period": "1 June to 14 July 2026",
+    "meeting_purpose": "Review progress and agree the next document-preparation steps",
+    "attention_topics": [
+      "Methods wording",
+      "Finding-versus-interpretation classification"
+    ]
+  },
+  "project_title": {
+    "item_id": "project_title",
+    "text": "Document-screening methods update",
+    "confidence": "high",
+    "wording_basis": "conservatively_summarised",
+    "review_status": "approved",
+    "inference_approved": false,
+    "provenance": [
+      {
+        "source_id": "source-a07c889c5f58403c",
+        "source_file": "progress_note.md",
+        "location": "heading: Progress note — 14 July 2026",
+        "relevant_date": "2026-07-14"
+      },
+      {
+        "source_id": "source-46be38a0e5843f73",
+        "source_file": "manuscript_section_v2_current.md",
+        "location": "heading: Methods section — current version",
+        "relevant_date": null
+      }
+    ]
+  },
+  "recent_progress": [
+    {
+      "item_id": "recent_progress-1",
+      "text": "The methods draft was updated to explain the document-screening sequence.",
+      "confidence": "high",
+      "wording_basis": "directly_stated",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "second bullet under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        }
+      ]
+    },
+    {
+      "item_id": "recent_progress-2",
+      "text": "A small quality-check table was prepared for discussion.",
+      "confidence": "high",
+      "wording_basis": "directly_stated",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "third bullet under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        }
+      ]
+    }
+  ],
+  "completed_work": [
+    {
+      "item_id": "completed_work-1",
+      "text": "The planned document-screening pass was completed.",
+      "confidence": "high",
+      "wording_basis": "directly_stated",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "first bullet under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        }
+      ]
+    },
+    {
+      "item_id": "completed_work-2",
+      "text": "The revised methods section distinguishes automated format checks from researcher review and records that the researcher makes the final inclusion decision.",
+      "confidence": "high",
+      "wording_basis": "conservatively_summarised",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-46be38a0e5843f73",
+          "source_file": "manuscript_section_v2_current.md",
+          "location": "first paragraph under Methods section — current version",
+          "relevant_date": null
+        }
+      ]
+    },
+    {
+      "item_id": "completed_work-3",
+      "text": "The document inventory and heading-consistency checks are recorded as complete, with one heading corrected.",
+      "confidence": "high",
+      "wording_basis": "conservatively_summarised",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-adac43c3167c372d",
+          "source_file": "results_check.csv",
+          "location": "rows 2–3; columns check, status and review_note",
+          "relevant_date": null
+        }
+      ]
+    }
+  ],
+  "key_findings": [],
+  "unresolved_questions": [
+    {
+      "item_id": "unresolved_questions-1",
+      "text": "Should the comparison paragraph be classified in the main findings or in the discussion?",
+      "confidence": "medium",
+      "wording_basis": "directly_stated",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "final paragraph under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        },
+        {
+          "source_id": "source-fa02b1d1f49ac814",
+          "source_file": "supervisor_comments.txt",
+          "location": "second sentence of the supervisor comment",
+          "relevant_date": null
+        },
+        {
+          "source_id": "source-adac43c3167c372d",
+          "source_file": "results_check.csv",
+          "location": "row 4; columns check, status and review_note",
+          "relevant_date": null
+        }
+      ]
+    }
+  ],
+  "decisions_required": [
+    {
+      "item_id": "decisions_required-1",
+      "text": "Confirm whether the comparison paragraph belongs in the main findings or the discussion.",
+      "confidence": "medium",
+      "wording_basis": "conservatively_summarised",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "final paragraph under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        },
+        {
+          "source_id": "source-fa02b1d1f49ac814",
+          "source_file": "supervisor_comments.txt",
+          "location": "second sentence of the supervisor comment",
+          "relevant_date": null
+        }
+      ]
+    }
+  ],
+  "next_actions": [
+    {
+      "item_id": "next_actions-1",
+      "text": "After the classification decision, update the paragraph's placement in the working draft.",
+      "confidence": "medium",
+      "wording_basis": "inferred",
+      "review_status": "approved",
+      "inference_approved": true,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "final paragraph under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        },
+        {
+          "source_id": "source-fa02b1d1f49ac814",
+          "source_file": "supervisor_comments.txt",
+          "location": "second sentence of the supervisor comment",
+          "relevant_date": null
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "item_id": "timeline-1",
+      "text": "Reporting period: 1 June to 14 July 2026.",
+      "confidence": "high",
+      "wording_basis": "directly_stated",
+      "review_status": "approved",
+      "inference_approved": false,
+      "provenance": [
+        {
+          "source_id": "source-a07c889c5f58403c",
+          "source_file": "progress_note.md",
+          "location": "Reporting period line under Progress note — 14 July 2026",
+          "relevant_date": "2026-07-14"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "issue_id": "issue-1",
+      "type": "classification_uncertainty",
+      "description": "The supplied materials do not establish whether the comparison paragraph is a substantive finding or discussion content.",
+      "source_ids": [
+        "source-fa02b1d1f49ac814"
+      ],
+      "status": "accepted",
+      "resolution": "Retain the matter as an unresolved question and required meeting decision; do not present it as a finding."
+    }
+  ]
+}

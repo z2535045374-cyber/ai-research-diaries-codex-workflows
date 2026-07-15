@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import re
 import subprocess
 import sys
@@ -27,12 +28,52 @@ MARKDOWN_FILES = (
     REPOSITORY_ROOT / "CUSTOMISING.md",
     REPOSITORY_ROOT / "CONTRIBUTING.md",
     REPOSITORY_ROOT / "CONTENT-LICENSE.md",
+    REPOSITORY_ROOT / "FOLDER_MODE_DESIGN.md",
+    REPOSITORY_ROOT / "FOLDER_MODE_TEST_RESULTS.md",
+    REPOSITORY_ROOT / "CHANGELOG.md",
     REPOSITORY_ROOT / "research-briefing-dashboard" / "SKILL.md",
     REPOSITORY_ROOT / "research-briefing-dashboard" / "CONTENT-LICENSE.md",
 )
-TEXT_SUFFIXES = {".html", ".json", ".md", ".py", ".txt", ".yaml", ".yml"}
+TEXT_SUFFIXES = {
+    ".csv",
+    ".html",
+    ".json",
+    ".md",
+    ".py",
+    ".txt",
+    ".yaml",
+    ".yml",
+}
 PUBLIC_TEXT_NAMES = {".gitignore", "LICENSE"}
 EXTERNAL_SCHEMES = {"http", "https", "mailto", "tel"}
+TARGET_RELEASE = "1.2.0"
+TARGET_WEBSITE_VERSION = "1.2"
+FOLDER_MODE_ARTEFACT_NAMES = {
+    "briefing_draft.json",
+    "excluded_files.md",
+    "final_briefing.html",
+    "final_briefing_input.json",
+    "final_source_map.md",
+    "final_validation_report.md",
+    "source_inventory.csv",
+    "source_map.md",
+    "unresolved_items.md",
+}
+REQUIRED_V12_PACKAGE_MEMBERS = {
+    "examples/folder-mode/EXAMPLE_NOTES.md",
+    "examples/folder-mode/final/final_briefing.html",
+    "examples/folder-mode/final/final_briefing_input.json",
+    "examples/folder-mode/final/final_source_map.md",
+    "examples/folder-mode/final/final_validation_report.md",
+    "examples/folder-mode/review/briefing_draft.json",
+    "examples/folder-mode/review/excluded_files.md",
+    "examples/folder-mode/review/source_inventory.csv",
+    "examples/folder-mode/review/source_map.md",
+    "examples/folder-mode/review/unresolved_items.md",
+    "package_manifest.txt",
+    "scripts/folder_mode.py",
+    "tests/test_folder_mode.py",
+}
 AMERICAN_TO_BRITISH = {
     "acknowledgment": "acknowledgement",
     "analyze": "analyse",
@@ -80,10 +121,29 @@ PRIVACY_PATTERNS = {
     ),
     "macOS user path": re.compile(r"/Users/[^\s<>'\"]+"),
     "Windows user path": re.compile(r"[A-Z]:\\Users\\[^\s<>'\"]+", re.IGNORECASE),
-    "local file URL": re.compile(r"\bfile://", re.IGNORECASE),
+    "local file URL": re.compile(
+        r"\bfile:///(?:Users|home|private|tmp|[A-Z]:)[^\s<>'\"]+",
+        re.IGNORECASE,
+    ),
     "OpenAI-style secret": re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"),
     "AWS-style access key": re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
 }
+POSIX_ABSOLUTE_PATH_IN_PROSE_PATTERN = re.compile(
+    r"(?<![\w._/\\-])/(?!\s)[^\s<>'\"`]+"
+)
+UNC_ABSOLUTE_PATH_IN_PROSE_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_\\])\\\\[^\\\s]+\\[^\\\s]+"
+)
+HOME_DIRECTORY_PATH_IN_PROSE_PATTERN = re.compile(
+    r"(?<![\w._-])~(?:"
+    r"[A-Za-z][A-Za-z0-9._-]*(?=$|[\s,;:)\]}])"
+    r"|(?:[A-Za-z0-9._-]+)?[/\\][^\s<>'\"`]+"
+    r")"
+)
+NETWORK_URL_IN_PROSE_PATTERN = re.compile(
+    r"\bhttps?://[^\s<>'\"`]+",
+    re.IGNORECASE,
+)
 FORBIDDEN_ARCHIVE_PARTS = {
     ".DS_Store",
     ".pytest_cache",
@@ -95,6 +155,51 @@ FORBIDDEN_ARCHIVE_PARTS = {
 
 class PublicationError(RuntimeError):
     """Collect a publication validation failure."""
+
+
+def load_packager():
+    """Load the archive builder without relying on the caller's import path."""
+    path = REPOSITORY_ROOT / "scripts" / "package_skill.py"
+    specification = importlib.util.spec_from_file_location(
+        "publication_package_skill",
+        path,
+    )
+    if specification is None or specification.loader is None:
+        raise PublicationError("Could not load scripts/package_skill.py")
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
+def published_html_files() -> tuple[Path, ...]:
+    """Return every public page and packaged, generated HTML example."""
+    pages = list(PUBLISHED_HTML)
+    try:
+        package_sources = load_packager().source_files()
+    except (OSError, ValueError) as exc:
+        raise PublicationError(f"Skill package allow-list failed: {exc}") from exc
+    pages.extend(
+        source
+        for source in package_sources
+        if source.suffix.lower() in {".htm", ".html"}
+        and "examples" in source.relative_to(
+            REPOSITORY_ROOT / "research-briefing-dashboard"
+        ).parts
+    )
+    return tuple(dict.fromkeys(path.resolve() for path in pages))
+
+
+def publication_markdown_files() -> tuple[Path, ...]:
+    """Return root documentation and every Markdown file in the Skill package."""
+    documents = list(MARKDOWN_FILES)
+    try:
+        package_sources = load_packager().source_files()
+    except (OSError, ValueError) as exc:
+        raise PublicationError(f"Skill package allow-list failed: {exc}") from exc
+    documents.extend(
+        source for source in package_sources if source.suffix.lower() == ".md"
+    )
+    return tuple(dict.fromkeys(path.resolve() for path in documents))
 
 
 class PageInventory(HTMLParser):
@@ -312,12 +417,55 @@ def validate_british_english(prose_by_path: dict[Path, str]) -> None:
         raise PublicationError("American English spelling detected:\n- " + "\n- ".join(issues))
 
 
+def privacy_prose(path: Path, source: str) -> str:
+    """Return public-facing prose suitable for generic absolute-path checks."""
+    if path.name == ".gitignore":
+        return ""
+    suffix = path.suffix.lower()
+    if suffix in {".html", ".htm"}:
+        inventory = PageInventory()
+        inventory.feed(source)
+        inventory.close()
+        return "\n".join(inventory.visible_text)
+    if suffix == ".md":
+        return markdown_prose(source)
+    if suffix in {".py", ".css", ".js"}:
+        return ""
+    return source
+
+
+def contains_generic_absolute_path(path: Path, source: str) -> bool:
+    prose = NETWORK_URL_IN_PROSE_PATTERN.sub(" ", privacy_prose(path, source))
+    # A bare `file://` token appears in offline-opening guidance and has no
+    # filesystem target. Keep rejecting file URLs that include a third slash
+    # or any following path material.
+    prose = re.sub(r"\bfile://(?=\s|$)", " ", prose, flags=re.IGNORECASE)
+    return bool(
+        POSIX_ABSOLUTE_PATH_IN_PROSE_PATTERN.search(prose)
+        or UNC_ABSOLUTE_PATH_IN_PROSE_PATTERN.search(prose)
+        or HOME_DIRECTORY_PATH_IN_PROSE_PATTERN.search(prose)
+    )
+
+
 def validate_privacy(paths: list[Path]) -> None:
     issues: list[str] = []
     for path in paths:
         relative = path.relative_to(REPOSITORY_ROOT)
         if ".superpowers" in relative.parts:
             issues.append(f"{relative}: private planning artefact is tracked")
+            continue
+        name = relative.name.lower()
+        is_approval = relative.suffix.lower() == ".json" and "approval" in name
+        is_sanitised_example = relative.parts[:3] == (
+            "research-briefing-dashboard",
+            "examples",
+            "folder-mode",
+        )
+        if is_approval or ".research-briefing-work" in relative.parts:
+            issues.append(f"{relative}: private Folder Mode run artefact is public")
+            continue
+        if name in FOLDER_MODE_ARTEFACT_NAMES and not is_sanitised_example:
+            issues.append(f"{relative}: unexpected Folder Mode run artefact is public")
             continue
         if path.resolve() == Path(__file__).resolve():
             continue
@@ -329,6 +477,8 @@ def validate_privacy(paths: list[Path]) -> None:
         for label, pattern in PRIVACY_PATTERNS.items():
             if pattern.search(source):
                 issues.append(f"{relative}: contains {label}")
+        if contains_generic_absolute_path(path, source):
+            issues.append(f"{relative}: contains an absolute local path")
     if issues:
         raise PublicationError("Privacy boundary failed:\n- " + "\n- ".join(issues))
 
@@ -375,18 +525,59 @@ def validate_skill_metadata() -> None:
 
 
 def expected_archive_members() -> dict[str, Path]:
-    """Map every publishable Skill member to its current source file."""
-    skill_root = REPOSITORY_ROOT / "research-briefing-dashboard"
-    expected: dict[str, Path] = {}
-    for source in skill_root.rglob("*"):
-        relative = source.relative_to(skill_root)
-        if any(part in FORBIDDEN_ARCHIVE_PARTS for part in relative.parts):
-            continue
-        if source.suffix.lower() in {".pyc", ".pyo"}:
-            continue
-        if source.is_file() and not source.is_symlink():
-            expected[source.relative_to(REPOSITORY_ROOT).as_posix()] = source
-    return expected
+    """Map explicit allow-listed Skill members to their current source files."""
+    try:
+        sources = load_packager().source_files()
+    except (OSError, ValueError) as exc:
+        raise PublicationError(f"Skill package allow-list failed: {exc}") from exc
+    return {
+        source.relative_to(REPOSITORY_ROOT).as_posix(): source
+        for source in sources
+    }
+
+
+def validate_release_consistency() -> None:
+    """Require the public site, release notes and package to agree on v1.2."""
+    readme = read_text(REPOSITORY_ROOT / "README.md")
+    index = read_text(REPOSITORY_ROOT / "index.html")
+    changelog_path = REPOSITORY_ROOT / "CHANGELOG.md"
+    changelog = read_text(changelog_path)
+    issues: list[str] = []
+    website_pattern = (
+        rf"\bVersion\s+{re.escape(TARGET_WEBSITE_VERSION)}(?:\.0)?\b"
+    )
+    if not re.search(website_pattern, readme):
+        issues.append(
+            f"README.md does not identify Version {TARGET_WEBSITE_VERSION}"
+        )
+    if not re.search(website_pattern, index):
+        issues.append(
+            f"index.html does not identify Version {TARGET_WEBSITE_VERSION}"
+        )
+    release_pattern = rf"^##\s+\[?{re.escape(TARGET_RELEASE)}\]?(?:\s|$)"
+    if not re.search(release_pattern, changelog, re.MULTILINE):
+        issues.append(
+            f"CHANGELOG.md does not contain a {TARGET_RELEASE} release heading"
+        )
+
+    try:
+        packaged = {
+            source.relative_to(
+                REPOSITORY_ROOT / "research-briefing-dashboard"
+            ).as_posix()
+            for source in load_packager().source_files()
+        }
+    except (OSError, ValueError) as exc:
+        issues.append(f"package allow-list could not be checked: {exc}")
+    else:
+        missing = sorted(REQUIRED_V12_PACKAGE_MEMBERS - packaged)
+        if missing:
+            issues.append(
+                "v1.2 package member(s) are absent: " + ", ".join(missing)
+            )
+
+    if issues:
+        raise PublicationError("Release consistency failed:\n- " + "\n- ".join(issues))
 
 
 def markdown_prose(source: str) -> str:
@@ -401,9 +592,12 @@ def validate_archive(path: Path) -> int:
     if not path.exists():
         raise PublicationError(f"{path.name}: archive is missing")
     expected = expected_archive_members()
+    packager = load_packager()
     issues: list[str] = []
     archive_prose: dict[Path, str] = {}
     with zipfile.ZipFile(path) as archive:
+        if archive.comment:
+            issues.append("contains an archive comment")
         bad_member = archive.testzip()
         if bad_member:
             issues.append(f"CRC failure in {bad_member}")
@@ -411,6 +605,10 @@ def validate_archive(path: Path) -> int:
         names = set(ordered_names)
         if len(ordered_names) != len(names):
             issues.append("contains duplicate member names")
+        if ordered_names != list(expected):
+            issues.append(
+                "member order does not match the canonical package allow-list"
+            )
         missing = sorted(set(expected) - names)
         unexpected = sorted(names - set(expected))
         if missing:
@@ -419,6 +617,7 @@ def validate_archive(path: Path) -> int:
             issues.append("unexpected member(s): " + ", ".join(unexpected))
 
         for name in ordered_names:
+            information = archive.getinfo(name)
             member = Path(name)
             if member.is_absolute() or ".." in member.parts or "\\" in name:
                 issues.append(f"unsafe member path {name!r}")
@@ -429,6 +628,18 @@ def validate_archive(path: Path) -> int:
             lowered = member.name.lower()
             if "meeting-state" in lowered and lowered.endswith(".json"):
                 issues.append(f"exported meeting state {name!r}")
+            if information.date_time != packager.ARCHIVE_TIMESTAMP:
+                issues.append(f"non-canonical timestamp for {name!r}")
+            if information.create_system != 3:
+                issues.append(f"non-canonical creator system for {name!r}")
+            if information.external_attr != 0o100644 << 16:
+                issues.append(f"non-canonical file mode for {name!r}")
+            if information.compress_type != zipfile.ZIP_DEFLATED:
+                issues.append(f"non-canonical compression for {name!r}")
+            if information.comment:
+                issues.append(f"contains a member comment for {name!r}")
+            if information.extra:
+                issues.append(f"contains unexpected extra metadata for {name!r}")
 
             data = archive.read(name)
             source_path = expected.get(name)
@@ -444,6 +655,8 @@ def validate_archive(path: Path) -> int:
             for label, pattern in PRIVACY_PATTERNS.items():
                 if pattern.search(text):
                     issues.append(f"{name!r} contains {label}")
+            if contains_generic_absolute_path(member, text):
+                issues.append(f"{name!r} contains an absolute local path")
 
             if member.suffix.lower() in {".html", ".htm"}:
                 inventory = PageInventory()
@@ -483,12 +696,16 @@ def main(argv: list[str]) -> int:
     arguments = parser.parse_args(argv[1:])
 
     try:
-        pages = [*PUBLISHED_HTML, *(path.resolve() for path in arguments.generated_html)]
+        pages = [
+            *published_html_files(),
+            *(path.resolve() for path in arguments.generated_html),
+        ]
+        markdown_files = publication_markdown_files()
         prose_by_path: dict[Path, str] = {}
         for path in pages:
             inventory = validate_html(path)
             prose_by_path[path] = "\n".join(inventory.visible_text)
-        for path in MARKDOWN_FILES:
+        for path in markdown_files:
             validate_markdown_links(path)
             prose_by_path[path] = prose_from_markdown(path)
         agents_yaml = REPOSITORY_ROOT / "research-briefing-dashboard" / "agents" / "openai.yaml"
@@ -497,6 +714,7 @@ def main(argv: list[str]) -> int:
         inventory = public_inventory()
         validate_privacy(inventory)
         validate_skill_metadata()
+        validate_release_consistency()
         archive_members = validate_archive(
             REPOSITORY_ROOT / "Supervisor_Meeting_HTML_Skill.zip"
         )
@@ -506,7 +724,7 @@ def main(argv: list[str]) -> int:
 
     print(
         "Publication validation passed: "
-        f"{len(pages)} HTML files, {len(MARKDOWN_FILES)} Markdown files, "
+        f"{len(pages)} HTML files, {len(markdown_files)} Markdown files, "
         f"{len(inventory)} public paths, {archive_members} ZIP members."
     )
     return 0

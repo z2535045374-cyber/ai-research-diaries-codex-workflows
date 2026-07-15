@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
-  <title>{{PROJECT_TITLE}} — {{BRIEFING_LABEL}}</title>
+  <title>Document-screening methods update — Supervisor meeting briefing</title>
   <script>document.documentElement.classList.add("js")</script>
   <style>
     :root {
@@ -13,12 +13,12 @@
       --paper: #ffffff;
       --page: #edf2f4;
       --panel: #f7f9fa;
-      --accent: {{ACCENT}};
-      --accent-foreground: {{ACCENT_FOREGROUND}};
-      --accent-on-surface: {{ACCENT_ON_SURFACE}};
-      --highlight: {{HIGHLIGHT}};
-      --highlight-foreground: {{HIGHLIGHT_FOREGROUND}};
-      --highlight-on-surface: {{HIGHLIGHT_ON_SURFACE}};
+      --accent: #0f5c5e;
+      --accent-foreground: #ffffff;
+      --accent-on-surface: #0f5c5e;
+      --highlight: #b56a00;
+      --highlight-foreground: #000000;
+      --highlight-on-surface: #a86200;
       --focus-inner: #ffffff;
       --focus-outer: #000000;
       --border: #c8d2d8;
@@ -1035,30 +1035,583 @@
     }
   </style>
 </head>
-<body data-brief-id="{{BRIEF_ID}}">
+<body data-brief-id="21036694032284e4c4def658032f80d5152ec47aff3bda7e0aef1f9efd3aa8c8">
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <div class="page-shell">
     <header class="masthead">
-      <p class="kicker">{{BRIEFING_LABEL}}</p>
-      <h1 class="project-title" id="briefing-item-project_title">{{PROJECT_TITLE}}</h1>
-      {{TITLE_EVIDENCE_LINK}}
-      {{EVIDENCE_STATUSLINE}}
-      {{REVIEW_WARNING}}
+      <p class="kicker">Supervisor meeting briefing</p>
+      <h1 class="project-title" id="briefing-item-project_title">Document-screening methods update</h1>
+      <a class="evidence-link" href="#evidence-item-project_title">View evidence (2 sources)</a>
+      <dl class="evidence-statusline" aria-label="Evidence review status"><div><dt>Review</dt><dd>Approved</dd></div><div><dt>Traceability</dt><dd>Source-grounded review</dd></div><div><dt>Coverage</dt><dd>10 briefing items</dd></div><div><dt>Sources</dt><dd>4 sources</dd></div></dl>
     </header>
 
-    {{MOBILE_NAVIGATION}}
-    {{WORKSPACE_CONTROLS}}
+        <nav class="mobile-nav" aria-label="Briefing sections on small screens">
+      <label for="mobile-group-nav">Go to section</label>
+      <select id="mobile-group-nav">
+          <option value="overview">Overview</option>
+          <option value="progress_evidence">Progress and evidence</option>
+          <option value="discussion">Discussion workspace</option>
+          <option value="actions_timeline">Actions and timeline</option>
+          <option value="evidence">Evidence Explorer</option>
+      </select>
+    </nav>
+    <section class="workspace-tools" aria-label="Meeting workspace tools">
+      <div class="search-control">
+        <label for="workspace-search">Search briefing</label>
+        <input type="search" id="workspace-search" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="workspace-button-group" aria-label="Workspace display controls">
+        <button type="button" id="expand-all">Expand all</button>
+        <button type="button" id="collapse-all">Collapse all</button>
+        <button type="button" id="print-briefing" class="emphasised-control">Print</button>
+      </div>
+      <div class="workspace-button-group state-button-group" aria-label="Meeting state controls">
+        <button type="button" id="export-state">Export state</button>
+        <input type="file" id="import-state" accept="application/json,.json">
+        <label for="import-state" class="button-label">Import state</label>
+        <button type="button" id="reset-state">Reset state</button>
+        <p class="state-confidentiality-warning"><strong>Confidentiality:</strong> Exported meeting-state files may contain confidential material. They remain on this device. They are not uploaded by this workspace.</p>
+        <p id="state-message" class="state-message" role="status" aria-live="polite"></p>
+      </div>
+    </section>
     <noscript>
       <p class="no-script-message">Interactive tools require JavaScript; all supplied research content remains available below.</p>
     </noscript>
 
     <div class="workspace-layout">
       <aside class="workspace-navigation">
-{{DESKTOP_NAVIGATION}}
+      <nav class="sidebar-nav" aria-label="Briefing sections">
+        <h2>Meeting workspace</h2>
+        <ul>
+        <li><a href="#group-overview" data-nav-group="overview">Overview</a></li>
+        <li><a href="#group-progress_evidence" data-nav-group="progress_evidence">Progress and evidence</a></li>
+        <li><a href="#group-discussion" data-nav-group="discussion">Discussion workspace</a></li>
+        <li><a href="#group-actions_timeline" data-nav-group="actions_timeline">Actions and timeline</a></li>
+        <li><a href="#group-evidence" data-nav-group="evidence">Evidence Explorer</a></li>
+        </ul>
+      </nav>
       </aside>
 
       <main id="main-content" tabindex="-1">
-{{GROUPS}}
+      <details class="workspace-group" open id="group-overview" data-group="overview">
+        <summary><span class="summary-marker" aria-hidden="true"></span><h2 id="group-overview-heading">Overview</h2></summary>
+        <div class="group-body">
+        <section id="overview-counts" class="overview-counts" aria-labelledby="overview-counts-heading">
+          <h3 id="overview-counts-heading">Content counts</h3>
+          <dl>
+              <div class="count-card" data-count="2">
+                <dt>Recent progress</dt>
+                <dd>2</dd>
+              </div>
+              <div class="count-card" data-count="3">
+                <dt>Completed work</dt>
+                <dd>3</dd>
+              </div>
+              <div class="count-card" data-count="0">
+                <dt>Key findings</dt>
+                <dd>0</dd>
+              </div>
+              <div class="count-card" data-count="1">
+                <dt>Unresolved questions</dt>
+                <dd>1</dd>
+              </div>
+              <div class="count-card" data-count="1">
+                <dt>Decisions required</dt>
+                <dd>1</dd>
+              </div>
+              <div class="count-card" data-count="1">
+                <dt>Next actions</dt>
+                <dd>1</dd>
+              </div>
+              <div class="count-card" data-count="1">
+                <dt>Timeline</dt>
+                <dd>1</dd>
+              </div>
+          </dl>
+        </section>
+        </div>
+      </details>
+      <details class="workspace-group" open id="group-progress_evidence" data-group="progress_evidence">
+        <summary><span class="summary-marker" aria-hidden="true"></span><h2 id="group-progress_evidence-heading">Progress and evidence</h2></summary>
+        <div class="group-body">
+          <section class="section-card" data-field="recent_progress" aria-labelledby="recent_progress-heading">
+            <h3 id="recent_progress-heading">Recent progress</h3>
+            <ul class="item-list">
+              <li id="briefing-item-recent_progress-1" data-briefing-item-id="recent_progress-1"><span class="source-text">The methods draft was updated to explain the document-screening sequence.</span><a class="evidence-link" href="#evidence-item-recent_progress-1">View evidence (1 source)</a></li>
+              <li id="briefing-item-recent_progress-2" data-briefing-item-id="recent_progress-2"><span class="source-text">A small quality-check table was prepared for discussion.</span><a class="evidence-link" href="#evidence-item-recent_progress-2">View evidence (1 source)</a></li>
+            </ul>
+          </section>
+          <section class="section-card" data-field="completed_work" aria-labelledby="completed_work-heading">
+            <h3 id="completed_work-heading">Completed work</h3>
+            <ul class="item-list">
+              <li id="briefing-item-completed_work-1" data-briefing-item-id="completed_work-1"><span class="source-text">The planned document-screening pass was completed.</span><a class="evidence-link" href="#evidence-item-completed_work-1">View evidence (1 source)</a></li>
+              <li id="briefing-item-completed_work-2" data-briefing-item-id="completed_work-2"><span class="source-text">The revised methods section distinguishes automated format checks from researcher review and records that the researcher makes the final inclusion decision.</span><a class="evidence-link" href="#evidence-item-completed_work-2">View evidence (1 source)</a></li>
+              <li id="briefing-item-completed_work-3" data-briefing-item-id="completed_work-3"><span class="source-text">The document inventory and heading-consistency checks are recorded as complete, with one heading corrected.</span><a class="evidence-link" href="#evidence-item-completed_work-3">View evidence (1 source)</a></li>
+            </ul>
+          </section>
+          <section class="section-card" data-field="key_findings" aria-labelledby="key_findings-heading">
+            <h3 id="key_findings-heading">Key findings</h3>
+            <p class="empty-state">No items supplied.</p>
+          </section>
+        </div>
+      </details>
+      <details class="workspace-group" open id="group-discussion" data-group="discussion">
+        <summary><span class="summary-marker" aria-hidden="true"></span><h2 id="group-discussion-heading">Discussion workspace</h2></summary>
+        <div class="group-body">
+          <section class="section-card" data-field="unresolved_questions" aria-labelledby="unresolved_questions-heading">
+            <h3 id="unresolved_questions-heading">Unresolved questions</h3>
+            <ol class="item-list meeting-list">
+              <li class="meeting-item" id="briefing-item-unresolved_questions-1" data-briefing-item-id="unresolved_questions-1" data-state-id="unresolved_questions-1" data-state-kind="question">
+                <p class="source-text">Should the comparison paragraph be classified in the main findings or in the discussion?</p>
+                <a class="evidence-link" href="#evidence-item-unresolved_questions-1">View evidence (3 sources)</a>
+                <div class="meeting-item-controls">
+                  <div class="status-field">
+                    <input type="checkbox" id="unresolved_questions-1-discussed" data-state-control="discussed">
+                    <label for="unresolved_questions-1-discussed">Discussed</label>
+                  </div>
+                  <div class="note-field">
+                    <label for="unresolved_questions-1-note">Meeting note</label>
+                    <textarea id="unresolved_questions-1-note" data-state-control="note" maxlength="5000" rows="3"></textarea>
+                  </div>
+                </div>
+                <p class="print-state" aria-hidden="true"></p>
+              </li>
+            </ol>
+          </section>
+          <section class="section-card" data-field="decisions_required" aria-labelledby="decisions_required-heading">
+            <h3 id="decisions_required-heading">Decisions required</h3>
+            <ol class="item-list meeting-list">
+              <li class="meeting-item" id="briefing-item-decisions_required-1" data-briefing-item-id="decisions_required-1" data-state-id="decisions_required-1" data-state-kind="decision">
+                <p class="source-text">Confirm whether the comparison paragraph belongs in the main findings or the discussion.</p>
+                <a class="evidence-link" href="#evidence-item-decisions_required-1">View evidence (2 sources)</a>
+                <div class="meeting-item-controls">
+                  <div class="status-field select-field">
+                    <label for="decisions_required-1-status">Decision status</label>
+                    <select id="decisions_required-1-status" data-state-control="status">
+                      <option value="pending">Pending</option>
+                      <option value="agreed">Agreed</option>
+                      <option value="deferred">Deferred</option>
+                    </select>
+                  </div>
+                  <div class="note-field">
+                    <label for="decisions_required-1-note">Meeting note</label>
+                    <textarea id="decisions_required-1-note" data-state-control="note" maxlength="5000" rows="3"></textarea>
+                  </div>
+                </div>
+                <p class="print-state" aria-hidden="true"></p>
+              </li>
+            </ol>
+          </section>
+        </div>
+      </details>
+      <details class="workspace-group" open id="group-actions_timeline" data-group="actions_timeline">
+        <summary><span class="summary-marker" aria-hidden="true"></span><h2 id="group-actions_timeline-heading">Actions and timeline</h2></summary>
+        <div class="group-body">
+          <section class="section-card" data-field="next_actions" aria-labelledby="next_actions-heading">
+            <h3 id="next_actions-heading">Next actions</h3>
+            <ol class="item-list meeting-list">
+              <li class="meeting-item" id="briefing-item-next_actions-1" data-briefing-item-id="next_actions-1" data-state-id="next_actions-1" data-state-kind="action">
+                <p class="source-text">After the classification decision, update the paragraph&#x27;s placement in the working draft.</p>
+                <a class="evidence-link" href="#evidence-item-next_actions-1">View evidence (2 sources)</a>
+                <div class="meeting-item-controls">
+                  <div class="status-field">
+                    <input type="checkbox" id="next_actions-1-completed" data-state-control="completed">
+                    <label for="next_actions-1-completed">Completed</label>
+                  </div>
+                  <div class="note-field">
+                    <label for="next_actions-1-note">Meeting note</label>
+                    <textarea id="next_actions-1-note" data-state-control="note" maxlength="5000" rows="3"></textarea>
+                  </div>
+                </div>
+                <p class="print-state" aria-hidden="true"></p>
+              </li>
+            </ol>
+          </section>
+          <section class="section-card" data-field="timeline" aria-labelledby="timeline-heading">
+            <h3 id="timeline-heading">Timeline</h3>
+            <ul class="item-list">
+              <li id="briefing-item-timeline-1" data-briefing-item-id="timeline-1"><span class="source-text">Reporting period: 1 June to 14 July 2026.</span><a class="evidence-link" href="#evidence-item-timeline-1">View evidence (1 source)</a></li>
+            </ul>
+          </section>
+        </div>
+      </details>
+      <details class="workspace-group" open id="group-evidence" data-group="evidence" data-evidence-group>
+        <summary><span class="summary-marker" aria-hidden="true"></span><h2 id="group-evidence-heading">Evidence Explorer</h2></summary>
+        <div class="group-body evidence-group-body">
+          <section class="evidence-summary" aria-labelledby="evidence-summary-heading">
+            <h3 id="evidence-summary-heading">Evidence summary</h3>
+            <dl>
+              <div class="count-card">
+                <dt>Approved briefing items</dt>
+                <dd>10</dd>
+              </div>
+              <div class="count-card">
+                <dt>Evidence sources</dt>
+                <dd>4</dd>
+              </div>
+              <div class="count-card">
+                <dt>Directly stated</dt>
+                <dd>5</dd>
+              </div>
+              <div class="count-card">
+                <dt>Conservative summaries</dt>
+                <dd>4</dd>
+              </div>
+              <div class="count-card">
+                <dt>Approved inferences</dt>
+                <dd>1</dd>
+              </div>
+              <div class="count-card">
+                <dt>Accepted boundaries</dt>
+                <dd>1</dd>
+              </div>
+            </dl>
+          </section>
+          <section class="evidence-controls" aria-labelledby="evidence-controls-heading">
+            <h3 id="evidence-controls-heading">Filter evidence</h3>
+            <div class="evidence-control-grid">
+              <label>Search evidence<input type="search" id="evidence-search" autocomplete="off"></label>
+              <label>Briefing category<select id="evidence-category-filter"><option value="all">All categories</option><option value="project_title">Project title</option>
+<option value="recent_progress">Recent progress</option>
+<option value="completed_work">Completed work</option>
+<option value="unresolved_questions">Unresolved questions</option>
+<option value="decisions_required">Decisions required</option>
+<option value="next_actions">Next actions</option>
+<option value="timeline">Timeline</option></select></label>
+              <label>Source<select id="evidence-source-filter"><option value="all">All sources</option><option value="source-46be38a0e5843f73">manuscript_section_v2_current.md</option>
+<option value="source-a07c889c5f58403c">progress_note.md</option>
+<option value="source-adac43c3167c372d">results_check.csv</option>
+<option value="source-fa02b1d1f49ac814">supervisor_comments.txt</option></select></label>
+              <label>Confidence<select id="evidence-confidence-filter"><option value="all">All confidence levels</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
+              <label>Wording basis<select id="evidence-basis-filter"><option value="all">All wording bases</option><option value="directly_stated">Directly stated</option><option value="conservatively_summarised">Conservatively summarised</option><option value="inferred">Inferred</option></select></label>
+              <label class="checkbox-control"><input type="checkbox" id="evidence-uncertainties-only">Accepted boundaries only</label>
+            </div>
+            <div class="evidence-filter-footer">
+              <button type="button" id="reset-evidence-filters">Reset evidence filters</button>
+              <p id="evidence-result-count" role="status" aria-live="polite"></p>
+            </div>
+          </section>
+          <section class="evidence-results" aria-labelledby="evidence-results-heading">
+            <h3 id="evidence-results-heading">Item-level evidence</h3>
+            <article class="evidence-record" id="evidence-item-project_title" tabindex="-1" data-evidence-record data-category="project_title" data-confidence="high" data-basis="conservatively_summarised" data-source-ids="source-a07c889c5f58403c source-46be38a0e5843f73" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">project_title</p>
+                  <h3>Project title</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Conservatively summarised</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">Document-screening methods update</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (2)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> heading: Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                  <li>
+                    <span class="evidence-source-path">manuscript_section_v2_current.md</span>
+                    <span><strong>Location:</strong> heading: Methods section — current version</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-project_title">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-recent_progress-1" tabindex="-1" data-evidence-record data-category="recent_progress" data-confidence="high" data-basis="directly_stated" data-source-ids="source-a07c889c5f58403c" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">recent_progress-1</p>
+                  <h3>Recent progress</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Directly stated</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">The methods draft was updated to explain the document-screening sequence.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> second bullet under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-recent_progress-1">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-recent_progress-2" tabindex="-1" data-evidence-record data-category="recent_progress" data-confidence="high" data-basis="directly_stated" data-source-ids="source-a07c889c5f58403c" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">recent_progress-2</p>
+                  <h3>Recent progress</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Directly stated</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">A small quality-check table was prepared for discussion.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> third bullet under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-recent_progress-2">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-completed_work-1" tabindex="-1" data-evidence-record data-category="completed_work" data-confidence="high" data-basis="directly_stated" data-source-ids="source-a07c889c5f58403c" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">completed_work-1</p>
+                  <h3>Completed work</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Directly stated</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">The planned document-screening pass was completed.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> first bullet under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-completed_work-1">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-completed_work-2" tabindex="-1" data-evidence-record data-category="completed_work" data-confidence="high" data-basis="conservatively_summarised" data-source-ids="source-46be38a0e5843f73" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">completed_work-2</p>
+                  <h3>Completed work</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Conservatively summarised</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">The revised methods section distinguishes automated format checks from researcher review and records that the researcher makes the final inclusion decision.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">manuscript_section_v2_current.md</span>
+                    <span><strong>Location:</strong> first paragraph under Methods section — current version</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-completed_work-2">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-completed_work-3" tabindex="-1" data-evidence-record data-category="completed_work" data-confidence="high" data-basis="conservatively_summarised" data-source-ids="source-adac43c3167c372d" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">completed_work-3</p>
+                  <h3>Completed work</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Conservatively summarised</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">The document inventory and heading-consistency checks are recorded as complete, with one heading corrected.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">results_check.csv</span>
+                    <span><strong>Location:</strong> rows 2–3; columns check, status and review_note</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-completed_work-3">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-unresolved_questions-1" tabindex="-1" data-evidence-record data-category="unresolved_questions" data-confidence="medium" data-basis="directly_stated" data-source-ids="source-a07c889c5f58403c source-fa02b1d1f49ac814 source-adac43c3167c372d" data-uncertain="true">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">unresolved_questions-1</p>
+                  <h3>Unresolved questions</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Directly stated</span>
+                  <span>Medium confidence</span>
+                  <span class="uncertainty-tag">Accepted boundary</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">Should the comparison paragraph be classified in the main findings or in the discussion?</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (3)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> final paragraph under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                  <li>
+                    <span class="evidence-source-path">supervisor_comments.txt</span>
+                    <span><strong>Location:</strong> second sentence of the supervisor comment</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                  <li>
+                    <span class="evidence-source-path">results_check.csv</span>
+                    <span><strong>Location:</strong> row 4; columns check, status and review_note</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-unresolved_questions-1">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-decisions_required-1" tabindex="-1" data-evidence-record data-category="decisions_required" data-confidence="medium" data-basis="conservatively_summarised" data-source-ids="source-a07c889c5f58403c source-fa02b1d1f49ac814" data-uncertain="true">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">decisions_required-1</p>
+                  <h3>Decisions required</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Conservatively summarised</span>
+                  <span>Medium confidence</span>
+                  <span class="uncertainty-tag">Accepted boundary</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">Confirm whether the comparison paragraph belongs in the main findings or the discussion.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (2)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> final paragraph under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                  <li>
+                    <span class="evidence-source-path">supervisor_comments.txt</span>
+                    <span><strong>Location:</strong> second sentence of the supervisor comment</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-decisions_required-1">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-next_actions-1" tabindex="-1" data-evidence-record data-category="next_actions" data-confidence="medium" data-basis="inferred" data-source-ids="source-a07c889c5f58403c source-fa02b1d1f49ac814" data-uncertain="true">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">next_actions-1</p>
+                  <h3>Next actions</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Inferred</span>
+                  <span>Medium confidence</span>
+                  <span class="uncertainty-tag">Accepted boundary</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">After the classification decision, update the paragraph&#x27;s placement in the working draft.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (2)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> final paragraph under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                  <li>
+                    <span class="evidence-source-path">supervisor_comments.txt</span>
+                    <span><strong>Location:</strong> second sentence of the supervisor comment</span>
+                    <span><strong>Relevant date:</strong> Not supplied</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-next_actions-1">Return to briefing item</a>
+            </article>
+            <article class="evidence-record" id="evidence-item-timeline-1" tabindex="-1" data-evidence-record data-category="timeline" data-confidence="high" data-basis="directly_stated" data-source-ids="source-a07c889c5f58403c" data-uncertain="false">
+              <header class="evidence-record-head">
+                <div>
+                  <p class="evidence-record-id">timeline-1</p>
+                  <h3>Timeline</h3>
+                </div>
+                <div class="evidence-tags" aria-label="Evidence status">
+                  <span>Directly stated</span>
+                  <span>High confidence</span>
+                </div>
+              </header>
+              <p class="evidence-item-text">Reporting period: 1 June to 14 July 2026.</p>
+              <details class="evidence-sources">
+                <summary>Evidence sources (1)</summary>
+                <ul>
+                  <li>
+                    <span class="evidence-source-path">progress_note.md</span>
+                    <span><strong>Location:</strong> Reporting period line under Progress note — 14 July 2026</span>
+                    <span><strong>Relevant date:</strong> 2026-07-14</span>
+                  </li>
+                </ul>
+              </details>
+              <a class="return-link" href="#briefing-item-timeline-1">Return to briefing item</a>
+            </article>
+          </section>
+          <section class="evidence-catalogue" aria-labelledby="evidence-catalogue-heading">
+            <h3 id="evidence-catalogue-heading">Source catalogue</h3>
+            <div class="evidence-table-wrap">
+              <table>
+                <caption>Approved sources used by this briefing</caption>
+                <thead><tr><th scope="col">Source</th><th scope="col">Type</th><th scope="col">Version</th><th scope="col">Read status</th><th scope="col">Modified</th></tr></thead>
+                <tbody>
+                <tr>
+                  <th scope="row">manuscript_section_v2_current.md</th>
+                  <td>Markdown</td>
+                  <td>Current candidate</td>
+                  <td>Read</td>
+                  <td>2026-07-15T04:41:57.596436Z</td>
+                </tr>
+                <tr>
+                  <th scope="row">progress_note.md</th>
+                  <td>Markdown</td>
+                  <td>Single</td>
+                  <td>Read</td>
+                  <td>2026-07-15T04:41:57.596146Z</td>
+                </tr>
+                <tr>
+                  <th scope="row">results_check.csv</th>
+                  <td>CSV</td>
+                  <td>Single</td>
+                  <td>Read</td>
+                  <td>2026-07-15T04:41:57.596565Z</td>
+                </tr>
+                <tr>
+                  <th scope="row">supervisor_comments.txt</th>
+                  <td>Plain text</td>
+                  <td>Single</td>
+                  <td>Read</td>
+                  <td>2026-07-15T04:41:57.596726Z</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="evidence-boundaries" aria-labelledby="evidence-boundaries-heading">
+            <h3 id="evidence-boundaries-heading">Accepted evidence boundaries</h3>
+              <article class="evidence-boundary">
+                <p class="evidence-record-id">issue-1</p>
+                <h3>Classification uncertainty</h3>
+                <p>The supplied materials do not establish whether the comparison paragraph is a substantive finding or discussion content.</p>
+                <p><strong>Accepted:</strong> Retain the matter as an unresolved question and required meeting decision; do not present it as a finding.</p>
+              </article>
+          </section>
+        </div>
+      </details>
       </main>
     </div>
 
@@ -1075,9 +1628,9 @@
       const MAX_IMPORT_BYTES = 262144;
       const MAX_NOTE_CODE_POINTS = 5000;
       const STATE_FILENAME = "supervisor-meeting-state.json";
-      const BRIEF_ID = "{{BRIEF_ID}}";
-      const FEATURES = {{FEATURES_JSON}};
-      const EXPECTED_IDS = {{STATE_IDS_JSON}};
+      const BRIEF_ID = "21036694032284e4c4def658032f80d5152ec47aff3bda7e0aef1f9efd3aa8c8";
+      const FEATURES = {"collapse_controls":true,"counts":true,"meeting_state":true,"print":true,"search":true};
+      const EXPECTED_IDS = {"actions":["next_actions-1"],"decisions":["decisions_required-1"],"questions":["unresolved_questions-1"]};
       const DECISION_STATUSES = ["pending", "agreed", "deferred"];
       const groups = Array.from(document.querySelectorAll(".workspace-group"));
       const navigationLinks = Array.from(document.querySelectorAll("[data-nav-group]"));

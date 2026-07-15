@@ -36,6 +36,85 @@ def sanitised_payload() -> dict[str, Any]:
     }
 
 
+def sanitised_evidence(payload: dict[str, Any]) -> dict[str, Any]:
+    brief_id = hashlib.sha256(
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    sources = [
+        {
+            "source_id": "source-001",
+            "display_path": "notes/progress_note.md",
+            "file_type": "Markdown",
+            "modified_at": "2026-07-14",
+            "version_status": "current",
+            "read_status": "read",
+        },
+        {
+            "source_id": "source-002",
+            "display_path": "tables/checks.csv",
+            "file_type": "CSV",
+            "modified_at": "2026-07-13",
+            "version_status": "single",
+            "read_status": "read",
+        },
+    ]
+    item_texts = {"project_title": payload["project_title"]}
+    for field in (
+        "recent_progress",
+        "completed_work",
+        "key_findings",
+        "unresolved_questions",
+        "decisions_required",
+        "next_actions",
+        "timeline",
+    ):
+        for index, text in enumerate(payload[field], start=1):
+            item_texts[f"{field}-{index}"] = text
+    items: dict[str, Any] = {}
+    for item_id, text in item_texts.items():
+        source_id = "source-002" if item_id == "key_findings-1" else "source-001"
+        items[item_id] = {
+            "wording_basis": (
+                "conservatively_summarised"
+                if item_id in {"project_title", "unresolved_questions-1"}
+                else "directly_stated"
+            ),
+            "confidence": "medium" if item_id == "unresolved_questions-1" else "high",
+            "explicitly_approved": True,
+            "text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            "references": [
+                {
+                    "source_id": source_id,
+                    "location": "synthetic fixture location",
+                    "relevant_date": "2026-07-14",
+                }
+            ],
+        }
+    return {
+        "schema_version": 1,
+        "brief_id": brief_id,
+        "review_status": "approved",
+        "sources": sources,
+        "items": items,
+        "issues": [
+            {
+                "issue_id": "issue-001",
+                "type": "classification_uncertainty",
+                "description": "The classification remains a meeting boundary.",
+                "status": "accepted",
+                "resolution": "Retain it as an unresolved question.",
+                "item_ids": ["unresolved_questions-1"],
+                "source_ids": ["source-001"],
+            }
+        ],
+    }
+
+
 def locate_browser_tool() -> tuple[str | None, dict[str, str], str]:
     environment = os.environ.copy()
     cli = shutil.which("playwright-cli", path=environment.get("PATH"))
@@ -195,9 +274,14 @@ WORKSPACE_INTERACTION_WORKFLOW = r"""async page => {
 
   await page.setViewportSize({width: 390, height: 844});
   const mobileNavigation = page.locator("#mobile-group-nav");
-  await mobileNavigation.selectOption("discussion");
-  assert(await page.locator("#group-discussion").getAttribute("open") !== null, "Mobile navigation did not open the target group");
-  assert(await page.evaluate(() => document.activeElement?.closest("#group-discussion") !== null), "Mobile navigation did not move focus to the target group");
+  await mobileNavigation.selectOption("progress_evidence");
+  await page.waitForTimeout(250);
+  assert(await page.locator("#group-progress_evidence").getAttribute("open") !== null, "Mobile navigation did not open the target group");
+  assert(await page.evaluate(() => document.activeElement?.closest("#group-progress_evidence") !== null), "Mobile navigation did not move focus to the target group");
+  const retainedMobileGroup = await mobileNavigation.inputValue();
+  const mobileTargetTop = await page.locator("#group-progress_evidence").evaluate(element => element.getBoundingClientRect().top);
+  assert(retainedMobileGroup === "progress_evidence", "Mobile navigation did not retain the selected group: " + retainedMobileGroup + "; target top: " + mobileTargetTop);
+  assert(mobileTargetTop >= -4 && mobileTargetTop <= 24, "Mobile navigation did not align the selected group near the viewport top: " + mobileTargetTop);
   assert(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), "The mobile layout overflows horizontally");
   const mobileToolGap = await page.evaluate(() => {
     const searchBox = document.getElementById("workspace-search").getBoundingClientRect();
@@ -235,7 +319,10 @@ WORKSPACE_INTERACTION_WORKFLOW = r"""async page => {
 
   const browser = page.context().browser();
   assert(browser !== null, "The browser context is unavailable");
-  const noScriptContext = await browser.newContext({javaScriptEnabled: false});
+  const noScriptContext = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: {width: 390, height: 844}
+  });
   const noScriptPage = await noScriptContext.newPage();
   await noScriptPage.goto(page.url().split("#")[0], {waitUntil: "load"});
   assert(await noScriptPage.locator("html.js").count() === 0, "The no-script page retained the JavaScript marker");
@@ -248,6 +335,96 @@ WORKSPACE_INTERACTION_WORKFLOW = r"""async page => {
   assert(externalRequests.length === 0, "External requests: " + externalRequests.join("; "));
   assert(pageErrors.length === 0, "Page errors: " + pageErrors.join("; "));
   return {result: "PASS", navigation: true, search: true, collapse: true, print: true, mobile: true};
+}"""
+
+
+EVIDENCE_EXPLORER_WORKFLOW = r"""async page => {
+  const assert = (condition, message) => {
+    if (!condition) {
+      throw new Error(message);
+    }
+  };
+  const pageErrors = [];
+  const externalRequests = [];
+  page.on("pageerror", error => pageErrors.push(error.message));
+  page.on("console", message => {
+    if (message.type() === "error") {
+      pageErrors.push(message.text());
+    }
+  });
+  page.on("request", request => {
+    if (!request.url().startsWith(page.url().split("/").slice(0, 3).join("/"))) {
+      externalRequests.push(request.url());
+    }
+  });
+  await page.setViewportSize({width: 1280, height: 900});
+  await page.reload();
+  await page.waitForLoadState("domcontentloaded");
+
+  const groups = page.locator(".workspace-group");
+  const records = page.locator("[data-evidence-record]");
+  const visibleRecordCount = () => records.evaluateAll(
+    elements => elements.filter(element => !element.hidden).length
+  );
+  assert(await groups.count() === 5, "Evidence workspace did not render five groups");
+  assert(await records.count() === 8, "Evidence records are incomplete");
+  assert(await page.locator(".evidence-table-wrap tbody tr").count() === 2, "Source catalogue is incomplete");
+
+  await page.locator('[data-briefing-item-id="key_findings-1"] .evidence-link').click();
+  assert(await page.locator("#group-evidence").getAttribute("open") !== null, "Evidence link did not open the explorer");
+  assert(await page.evaluate(() => document.activeElement?.id === "evidence-item-key_findings-1"), "Evidence link did not move focus");
+
+  await page.locator("#evidence-category-filter").selectOption("key_findings");
+  assert(await visibleRecordCount() === 1, "Category filter did not isolate one record");
+  await page.locator("#reset-evidence-filters").click();
+  await page.locator("#evidence-source-filter").selectOption("source-002");
+  assert(await visibleRecordCount() === 1, "Source filter did not isolate one record");
+  await page.locator("#reset-evidence-filters").click();
+  await page.locator("#evidence-confidence-filter").selectOption("medium");
+  assert(await visibleRecordCount() === 1, "Confidence filter did not isolate one record");
+  await page.locator("#reset-evidence-filters").click();
+  await page.locator("#evidence-basis-filter").selectOption("conservatively_summarised");
+  assert(await visibleRecordCount() === 2, "Wording-basis filter is incorrect");
+  await page.locator("#reset-evidence-filters").click();
+  await page.locator("#evidence-uncertainties-only").check();
+  assert(await visibleRecordCount() === 1, "Boundary filter did not isolate one record");
+  await page.locator("#reset-evidence-filters").click();
+  await page.locator("#evidence-search").fill("participant details");
+  assert(await visibleRecordCount() === 1, "Evidence search did not isolate one record");
+  assert((await page.locator("#evidence-result-count").textContent()).startsWith("1 of 8"), "Result count was not announced");
+  await page.locator("#reset-evidence-filters").click();
+
+  await page.locator("#group-evidence .evidence-sources").first().evaluate(element => { element.open = false; });
+  await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+  assert(await page.locator("#group-evidence .evidence-sources").evaluateAll(elements => elements.every(element => element.open)), "Print preparation did not expand evidence sources");
+  await page.emulateMedia({media: "print"});
+  const printBreakInside = async selector => page.locator(selector).first().evaluate(element => getComputedStyle(element).breakInside);
+  assert((await printBreakInside("[data-evidence-record]")) === "avoid", "Print can split an evidence record");
+  assert((await printBreakInside(".evidence-sources li")) === "avoid", "Print can split a source record");
+  assert((await printBreakInside(".evidence-boundary")) === "avoid", "Print can split an accepted-boundary record");
+  await page.emulateMedia({media: "screen"});
+  await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+  assert(await page.locator("#group-evidence .evidence-sources").first().getAttribute("open") === null, "Print cleanup did not restore evidence source state");
+
+  await page.setViewportSize({width: 390, height: 844});
+  assert(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), "Evidence explorer overflows at 390 pixels");
+
+  const browser = page.context().browser();
+  const noScriptContext = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: {width: 390, height: 844}
+  });
+  const noScriptPage = await noScriptContext.newPage();
+  await noScriptPage.goto(page.url().split("#")[0], {waitUntil: "load"});
+  assert(await noScriptPage.locator(".workspace-group").count() === 5, "No-script mode omitted the evidence group");
+  assert(await noScriptPage.locator("[data-evidence-record]").count() === 8, "No-script mode omitted evidence records");
+  assert(await noScriptPage.locator(".evidence-controls").isHidden(), "No-script mode retained unusable filters");
+  assert(await noScriptPage.locator(".mobile-nav").isHidden(), "No-script mode retained an unusable mobile selector");
+  await noScriptContext.close();
+
+  assert(externalRequests.length === 0, "External requests: " + externalRequests.join("; "));
+  assert(pageErrors.length === 0, "Page errors: " + pageErrors.join("; "));
+  return {result: "PASS", evidenceLinks: true, filters: true, print: true, mobile: true, noScript: true};
 }"""
 
 
@@ -281,6 +458,29 @@ class BrowserMeetingStateTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(build.returncode, 0, build.stderr)
+
+        evidence_path = self.work / "sanitised-evidence.json"
+        self.evidence_output_path = self.work / "sanitised-evidence-briefing.html"
+        evidence_path.write_text(
+            json.dumps(sanitised_evidence(payload), ensure_ascii=False),
+            encoding="utf-8",
+        )
+        evidence_build = subprocess.run(
+            [
+                sys.executable,
+                str(BUILDER),
+                str(input_path),
+                str(self.evidence_output_path),
+                "--evidence",
+                str(evidence_path),
+            ],
+            cwd=SKILL_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(evidence_build.returncode, 0, evidence_build.stderr)
 
         canonical = json.dumps(
             payload,
@@ -328,10 +528,11 @@ class BrowserMeetingStateTests(unittest.TestCase):
         self.addCleanup(self._stop_server)
 
         port = self.server.server_address[1]
+        self.base_url = f"http://127.0.0.1:{port}"
         self.addCleanup(self._close_browser)
         open_result = self._run_cli(
             "open",
-            f"http://127.0.0.1:{port}/{output_path.name}",
+            f"{self.base_url}/{output_path.name}",
         )
         self.assertNotIn("### Error", open_result)
 
@@ -450,6 +651,23 @@ class BrowserMeetingStateTests(unittest.TestCase):
         self.assertIn('"collapse":true', output)
         self.assertIn('"print":true', output)
         self.assertIn('"mobile":true', output)
+
+    def test_evidence_explorer_links_filters_print_mobile_and_no_script(self) -> None:
+        open_result = self._run_cli(
+            "open",
+            f"{self.base_url}/{self.evidence_output_path.name}",
+        )
+        self.assertNotIn("### Error", open_result)
+        output = self._run_cli(
+            "run-code",
+            EVIDENCE_EXPLORER_WORKFLOW,
+            raw=True,
+        )
+
+        self.assertIn("PASS", output)
+        self.assertIn('"evidenceLinks":true', output)
+        self.assertIn('"filters":true', output)
+        self.assertIn('"noScript":true', output)
 
 
 if __name__ == "__main__":

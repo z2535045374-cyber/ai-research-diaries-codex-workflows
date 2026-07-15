@@ -22,6 +22,17 @@ supervisor-meeting-state.json
 meeting-state-*.json
 *.meeting-state.json
 
+# Private Folder Mode working and approval files
+.research-briefing-work/
+**/.research-briefing-work/
+**/folder-mode-review/
+**/folder-mode-final/
+approval.json
+briefing_approval.json
+folder_mode_approval.json
+*approval*.json
+*Approval*.json
+
 # Browser artefacts
 .playwright-cli/
 test-results/

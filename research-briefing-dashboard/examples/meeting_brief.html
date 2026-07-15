@@ -142,6 +142,57 @@
       white-space: pre-wrap;
     }
 
+    .masthead .evidence-link {
+      border-color: currentColor;
+      color: inherit;
+    }
+
+    .evidence-statusline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      width: fit-content;
+      max-width: 100%;
+      margin: 1.2rem 0 0;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+
+    .evidence-statusline div {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 0.35rem;
+      padding: 0.45rem 0.75rem 0.45rem 0;
+    }
+
+    .evidence-statusline div + div {
+      padding-left: 0.75rem;
+      border-left: 1px solid currentColor;
+    }
+
+    .evidence-statusline dt {
+      opacity: 0.72;
+      font-size: 0.72rem;
+      font-weight: 780;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .evidence-statusline dd {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 820;
+    }
+
+    .unconfirmed-warning {
+      margin: 1rem 0 0;
+      padding: 0.75rem 0.9rem;
+      border: 0.12rem solid currentColor;
+      background: var(--paper);
+      color: #761515;
+      font-weight: 650;
+    }
+
     .mobile-nav {
       display: none;
       padding: 1rem;
@@ -162,6 +213,10 @@
       border: 1px solid var(--border);
       border-radius: 0.35rem;
       background: var(--paper);
+    }
+
+    html:not(.js) .mobile-nav {
+      display: none;
     }
 
     .workspace-tools {
@@ -444,6 +499,16 @@
       white-space: pre-wrap;
     }
 
+    .evidence-link,
+    .return-link {
+      display: inline-block;
+      margin-top: 0.45rem;
+      color: var(--accent-on-surface);
+      font-size: 0.88rem;
+      font-weight: 780;
+      text-underline-offset: 0.18em;
+    }
+
     p.source-text {
       margin: 0;
     }
@@ -509,6 +574,257 @@
       background: var(--panel);
     }
 
+    .evidence-group-body {
+      display: block;
+      padding: 1rem;
+    }
+
+    .evidence-summary,
+    .evidence-controls,
+    .evidence-results,
+    .evidence-catalogue,
+    .evidence-boundaries {
+      min-width: 0;
+    }
+
+    .evidence-summary + *,
+    .evidence-controls + *,
+    .evidence-results + *,
+    .evidence-catalogue + * {
+      margin-top: 1.25rem;
+    }
+
+    .evidence-summary > h3,
+    .evidence-controls > h3,
+    .evidence-results > h3,
+    .evidence-catalogue > h3,
+    .evidence-boundaries > h3 {
+      margin: 0 0 0.7rem;
+      color: var(--accent-on-surface);
+      font-size: 1rem;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+    }
+
+    .evidence-summary dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+      gap: 0.55rem;
+      margin: 0;
+    }
+
+    .evidence-summary .count-card {
+      border-top: 0.18rem solid var(--accent-on-surface);
+      border-radius: 0.2rem;
+    }
+
+    html:not(.js) .evidence-controls {
+      display: none;
+    }
+
+    .evidence-controls {
+      padding: 0.85rem;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .evidence-control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+      gap: 0.7rem;
+    }
+
+    .evidence-control-grid label {
+      display: grid;
+      gap: 0.25rem;
+      align-content: start;
+      font-size: 0.86rem;
+      font-weight: 760;
+    }
+
+    .evidence-control-grid input,
+    .evidence-control-grid select {
+      width: 100%;
+      min-height: 2.55rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+      background: var(--paper);
+    }
+
+    .evidence-control-grid .checkbox-control {
+      display: flex;
+      align-items: center;
+      align-self: end;
+      min-height: 2.55rem;
+      gap: 0.45rem;
+    }
+
+    .evidence-control-grid .checkbox-control input {
+      width: 1.1rem;
+      min-height: 1.1rem;
+      accent-color: var(--accent-on-surface);
+    }
+
+    .evidence-filter-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    #evidence-result-count {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .evidence-record,
+    .evidence-boundary {
+      scroll-margin-top: 1rem;
+      padding: 0.9rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .evidence-record:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .evidence-record:focus {
+      outline: 0.2rem solid var(--focus-inner);
+      outline-offset: 0.12rem;
+      box-shadow: 0 0 0 0.4rem var(--focus-outer);
+    }
+
+    .evidence-record-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .evidence-record-head h3,
+    .evidence-boundary h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .evidence-record-id {
+      margin: 0 0 0.15rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 820;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .evidence-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: end;
+      gap: 0.35rem;
+    }
+
+    .evidence-tags span {
+      padding: 0.18rem 0.42rem;
+      border: 1px solid var(--border);
+      border-radius: 0.18rem;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 720;
+    }
+
+    .evidence-tags .uncertainty-tag {
+      border-color: var(--highlight-on-surface);
+      color: var(--highlight-on-surface);
+    }
+
+    .evidence-item-text {
+      max-width: 70rem;
+      margin: 0.7rem 0;
+      font-weight: 620;
+      white-space: pre-wrap;
+    }
+
+    .evidence-sources summary {
+      cursor: pointer;
+      color: var(--accent-on-surface);
+      font-weight: 760;
+    }
+
+    .evidence-sources ul {
+      display: grid;
+      gap: 0.55rem;
+      margin: 0.55rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .evidence-sources li {
+      display: grid;
+      grid-template-columns: minmax(10rem, 1.2fr) minmax(12rem, 1.5fr) minmax(8rem, 0.8fr);
+      gap: 0.55rem;
+      padding: 0.6rem;
+      border-left: 0.2rem solid var(--accent-on-surface);
+      background: var(--panel);
+      font-size: 0.86rem;
+    }
+
+    .evidence-source-path {
+      overflow-wrap: anywhere;
+      font-weight: 780;
+    }
+
+    .evidence-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    .evidence-table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    .evidence-table-wrap caption {
+      padding: 0.55rem;
+      background: var(--panel);
+      font-weight: 750;
+      text-align: left;
+    }
+
+    .evidence-table-wrap th,
+    .evidence-table-wrap td {
+      padding: 0.55rem;
+      border-top: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .evidence-table-wrap thead th {
+      background: var(--panel);
+      color: var(--accent-on-surface);
+    }
+
+    .evidence-table-wrap tbody th {
+      max-width: 24rem;
+      overflow-wrap: anywhere;
+    }
+
+    .evidence-boundary {
+      padding-right: 0.8rem;
+      padding-left: 0.8rem;
+      border-right: 1px solid var(--border);
+      border-left: 0.24rem solid var(--highlight-on-surface);
+      background: var(--panel);
+    }
+
+    .evidence-boundary p:last-child {
+      margin-bottom: 0;
+    }
+
     .document-footer {
       padding: 1rem clamp(1rem, 3vw, 2rem);
       border-top: 1px solid var(--border);
@@ -546,6 +862,40 @@
 
       .overview-counts {
         grid-column: auto;
+      }
+
+      .evidence-record-head,
+      .evidence-sources li {
+        display: block;
+      }
+
+      .evidence-statusline {
+        display: grid;
+        width: 100%;
+      }
+
+      .evidence-statusline div,
+      .evidence-statusline div + div {
+        padding: 0.42rem 0;
+        border-right: 0;
+        border-left: 0;
+      }
+
+      .evidence-statusline div + div {
+        border-top: 1px solid currentColor;
+      }
+
+      .evidence-tags {
+        justify-content: start;
+        margin-top: 0.55rem;
+      }
+
+      .evidence-sources li span {
+        display: block;
+      }
+
+      .evidence-sources li span + span {
+        margin-top: 0.3rem;
       }
     }
 
@@ -603,7 +953,10 @@
       .mobile-nav,
       .workspace-tools,
       .workspace-navigation,
-      .no-script-message {
+      .no-script-message,
+      .evidence-controls,
+      .evidence-link,
+      .return-link {
         display: none !important;
       }
 
@@ -630,11 +983,33 @@
 
       .workspace-group,
       .section-card,
-      .overview-counts {
+      .overview-counts,
+      .evidence-record,
+      .evidence-sources li,
+      .evidence-boundary {
         break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .evidence-sources > summary {
+        display: block;
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      .evidence-sources > summary::marker {
+        content: "";
+      }
+
+      .evidence-sources > summary::-webkit-details-marker {
+        display: none;
       }
 
       .workspace-group:not([open]) > *:not(summary) {
+        display: block !important;
+      }
+
+      .evidence-sources:not([open]) > *:not(summary) {
         display: block !important;
       }
 
@@ -665,7 +1040,7 @@
   <div class="page-shell">
     <header class="masthead">
       <p class="kicker">Research supervision workspace</p>
-      <h1 class="project-title">Urban heat, mobility and community health evidence synthesis</h1>
+      <h1 class="project-title" id="briefing-item-project_title">Urban heat, mobility and community health evidence synthesis</h1>
     </header>
 
         <nav class="mobile-nav" aria-label="Briefing sections on small screens">
@@ -758,20 +1133,20 @@
           <section class="section-card" data-field="recent_progress" aria-labelledby="recent_progress-heading">
             <h3 id="recent_progress-heading">Recent progress</h3>
             <ul class="item-list">
-              <li><span class="source-text">Mapped environmental exposure measures to public health outcomes across the selected studies.</span></li>
-              <li><span class="source-text">Revised the comparison framework to distinguish observational and modelling evidence.</span></li>
+              <li id="briefing-item-recent_progress-1" data-briefing-item-id="recent_progress-1"><span class="source-text">Mapped environmental exposure measures to public health outcomes across the selected studies.</span></li>
+              <li id="briefing-item-recent_progress-2" data-briefing-item-id="recent_progress-2"><span class="source-text">Revised the comparison framework to distinguish observational and modelling evidence.</span></li>
             </ul>
           </section>
           <section class="section-card" data-field="completed_work" aria-labelledby="completed_work-heading">
             <h3 id="completed_work-heading">Completed work</h3>
             <ul class="item-list">
-              <li><span class="source-text">Completed a sanitised evidence table covering climate, transport and health sources.</span></li>
+              <li id="briefing-item-completed_work-1" data-briefing-item-id="completed_work-1"><span class="source-text">Completed a sanitised evidence table covering climate, transport and health sources.</span></li>
             </ul>
           </section>
           <section class="section-card" data-field="key_findings" aria-labelledby="key_findings-heading">
             <h3 id="key_findings-heading">Key findings</h3>
             <ul class="item-list">
-              <li><span class="source-text">Studies use inconsistent spatial units, limiting direct comparison of heat and mobility measures.</span></li>
+              <li id="briefing-item-key_findings-1" data-briefing-item-id="key_findings-1"><span class="source-text">Studies use inconsistent spatial units, limiting direct comparison of heat and mobility measures.</span></li>
             </ul>
           </section>
         </div>
@@ -782,7 +1157,7 @@
           <section class="section-card" data-field="unresolved_questions" aria-labelledby="unresolved_questions-heading">
             <h3 id="unresolved_questions-heading">Unresolved questions</h3>
             <ol class="item-list meeting-list">
-              <li class="meeting-item" data-state-id="unresolved_questions-1" data-state-kind="question">
+              <li class="meeting-item" id="briefing-item-unresolved_questions-1" data-briefing-item-id="unresolved_questions-1" data-state-id="unresolved_questions-1" data-state-kind="question">
                 <p class="source-text">Should the synthesis prioritise neighbourhood-scale comparability or retain study-specific spatial detail?</p>
                 <div class="meeting-item-controls">
                   <div class="status-field">
@@ -801,7 +1176,7 @@
           <section class="section-card" data-field="decisions_required" aria-labelledby="decisions_required-heading">
             <h3 id="decisions_required-heading">Decisions required</h3>
             <ol class="item-list meeting-list">
-              <li class="meeting-item" data-state-id="decisions_required-1" data-state-kind="decision">
+              <li class="meeting-item" id="briefing-item-decisions_required-1" data-briefing-item-id="decisions_required-1" data-state-id="decisions_required-1" data-state-kind="decision">
                 <p class="source-text">Confirm the spatial scale to use in the next comparison table.</p>
                 <div class="meeting-item-controls">
                   <div class="status-field select-field">
@@ -829,7 +1204,7 @@
           <section class="section-card" data-field="next_actions" aria-labelledby="next_actions-heading">
             <h3 id="next_actions-heading">Next actions</h3>
             <ol class="item-list meeting-list">
-              <li class="meeting-item" data-state-id="next_actions-1" data-state-kind="action">
+              <li class="meeting-item" id="briefing-item-next_actions-1" data-briefing-item-id="next_actions-1" data-state-id="next_actions-1" data-state-kind="action">
                 <p class="source-text">Revise the methods note to document the selected spatial harmonisation rule.</p>
                 <div class="meeting-item-controls">
                   <div class="status-field">
@@ -848,7 +1223,7 @@
           <section class="section-card" data-field="timeline" aria-labelledby="timeline-heading">
             <h3 id="timeline-heading">Timeline</h3>
             <ul class="item-list">
-              <li><span class="source-text">Late August — complete the revised cross-disciplinary synthesis.</span></li>
+              <li id="briefing-item-timeline-1" data-briefing-item-id="timeline-1"><span class="source-text">Late August — complete the revised cross-disciplinary synthesis.</span></li>
             </ul>
           </section>
         </div>
@@ -877,6 +1252,7 @@
       const navigationLinks = Array.from(document.querySelectorAll("[data-nav-group]"));
       const mobileNavigation = document.getElementById("mobile-group-nav");
       let printOpenState = [];
+      let evidencePrintOpenState = [];
 
       function activateNavigation(identifier) {
         navigationLinks.forEach((link) => {
@@ -904,8 +1280,8 @@
             const target = document.getElementById("group-" + mobileNavigation.value);
             if (target) {
               target.open = true;
-              target.scrollIntoView({block: "start"});
-              target.querySelector("summary").focus();
+              target.querySelector("summary").focus({preventScroll: true});
+              target.scrollIntoView({block: "start", behavior: "instant"});
               activateNavigation(target.dataset.group);
             }
           });
@@ -964,6 +1340,72 @@
         if (printButton) {
           printButton.addEventListener("click", () => window.print());
         }
+      }
+
+      function initialiseEvidenceExplorer() {
+        const records = Array.from(document.querySelectorAll("[data-evidence-record]"));
+        if (records.length === 0) {
+          return;
+        }
+        const search = document.getElementById("evidence-search");
+        const category = document.getElementById("evidence-category-filter");
+        const source = document.getElementById("evidence-source-filter");
+        const confidence = document.getElementById("evidence-confidence-filter");
+        const basis = document.getElementById("evidence-basis-filter");
+        const uncertaintiesOnly = document.getElementById("evidence-uncertainties-only");
+        const reset = document.getElementById("reset-evidence-filters");
+        const count = document.getElementById("evidence-result-count");
+
+        function applyEvidenceFilters() {
+          const query = search.value.trim().toLocaleLowerCase("en-GB");
+          let visible = 0;
+          records.forEach((record) => {
+            const sourceIds = record.dataset.sourceIds.split(/\s+/).filter(Boolean);
+            const matches = (
+              (!query || record.textContent.toLocaleLowerCase("en-GB").includes(query)) &&
+              (category.value === "all" || record.dataset.category === category.value) &&
+              (source.value === "all" || sourceIds.includes(source.value)) &&
+              (confidence.value === "all" || record.dataset.confidence === confidence.value) &&
+              (basis.value === "all" || record.dataset.basis === basis.value) &&
+              (!uncertaintiesOnly.checked || record.dataset.uncertain === "true")
+            );
+            record.hidden = !matches;
+            if (matches) {
+              visible += 1;
+            }
+          });
+          count.textContent = visible + " of " + records.length + " evidence records shown.";
+        }
+
+        [search, category, source, confidence, basis, uncertaintiesOnly].forEach((control) => {
+          control.addEventListener("input", applyEvidenceFilters);
+          control.addEventListener("change", applyEvidenceFilters);
+        });
+        reset.addEventListener("click", () => {
+          search.value = "";
+          category.value = "all";
+          source.value = "all";
+          confidence.value = "all";
+          basis.value = "all";
+          uncertaintiesOnly.checked = false;
+          applyEvidenceFilters();
+          search.focus();
+        });
+
+        document.querySelectorAll(".evidence-link").forEach((link) => {
+          link.addEventListener("click", () => {
+            const evidenceGroup = document.getElementById("group-evidence");
+            if (evidenceGroup) {
+              evidenceGroup.open = true;
+              activateNavigation("evidence");
+            }
+            const target = document.querySelector(link.getAttribute("href"));
+            if (target) {
+              window.setTimeout(() => target.focus(), 0);
+            }
+          });
+        });
+        applyEvidenceFilters();
       }
 
       function isPlainObject(value) {
@@ -1221,16 +1663,23 @@
       window.addEventListener("beforeprint", () => {
         printOpenState = groups.map((group) => group.open);
         groups.forEach((group) => { group.open = true; });
+        const evidenceSources = Array.from(document.querySelectorAll(".evidence-sources"));
+        evidencePrintOpenState = evidenceSources.map((source) => source.open);
+        evidenceSources.forEach((source) => { source.open = true; });
         updateAllPrintStates();
       });
 
       window.addEventListener("afterprint", () => {
         groups.forEach((group, index) => { group.open = printOpenState[index]; });
+        document.querySelectorAll(".evidence-sources").forEach((source, index) => {
+          source.open = evidencePrintOpenState[index];
+        });
       });
 
       initialiseNavigation();
       initialiseSearch();
       initialiseDisplayControls();
+      initialiseEvidenceExplorer();
       initialiseMeetingState();
     })();
   </script>

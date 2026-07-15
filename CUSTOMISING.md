@@ -1,8 +1,114 @@
-# Customising the supervisor meeting workspace
+# Customising the research supervision workspace
 
-The builder accepts the same eight approved content fields in every presentation. Customisation changes how that material is displayed; it must not change, infer or relocate the source content.
+Version 1.2.0 supports two preparation routes while retaining one stable rendering boundary:
 
-## Copy an optional configuration
+- **Structured Mode** renders an approved eight-field JSON file directly.
+- **Folder Mode** inventories a folder or ZIP, supports source-grounded drafting and stops for researcher approval before converting approved items to the same eight-field schema.
+
+Customisation may change presentation and workflow defaults. It must not invent research content, transfer material between categories, weaken provenance checks or bypass the approval gate silently.
+
+## Use Structured Mode
+
+The input must contain exactly `project_title`, `recent_progress`, `completed_work`, `key_findings`, `unresolved_questions`, `decisions_required`, `next_actions` and `timeline`.
+
+From the Skill directory, build with the default presentation:
+
+```bash
+python3 scripts/build_briefing.py INPUT.json OUTPUT.html
+```
+
+Build with an optional presentation configuration:
+
+```bash
+python3 scripts/build_briefing.py INPUT.json OUTPUT.html --config CONFIG.json
+```
+
+Open the result locally and compare every displayed item with its approved source field.
+
+## Use Folder Mode
+
+Ask the coding agent to use the Skill rather than treating `folder_mode.py` as a summarisation program. The helper inventories and validates; the agent must read the source material with suitable file-reading tools and prepare the provenance-bearing draft.
+
+A recommended request is:
+
+> Use $research-briefing-dashboard to review all materials in ./Supervisor_Meeting_Materials. The reporting period is 1 June to 14 July 2026. Prepare a source-grounded draft for my supervisor meeting, show me any conflicts or unclear items, and generate the final HTML only after I approve the draft.
+
+Choose a new private review directory outside both the source folder and the public repository. From the Skill directory, inventory a folder or ZIP:
+
+```bash
+python3 scripts/folder_mode.py inventory SOURCE REVIEW_DIR \
+  --reporting-period "1 June to 14 July 2026" \
+  --meeting-purpose "Prepare the next supervisor meeting" \
+  --attention-topic "Methods wording"
+```
+
+Repeat `--attention-topic` or `--exclude` when required. The command creates exactly:
+
+- `source_inventory.csv`;
+- `source_map.md`;
+- `briefing_draft.json`;
+- `unresolved_items.md`; and
+- `excluded_files.md`.
+
+If inventory used an exclusion, repeat the exact option when validating and finalising. For example:
+
+```bash
+python3 scripts/folder_mode.py inventory SOURCE REVIEW_DIR \
+  --exclude "private_working_notes"
+python3 scripts/folder_mode.py validate-review SOURCE REVIEW_DIR \
+  --exclude "private_working_notes"
+python3 scripts/folder_mode.py finalise SOURCE REVIEW_DIR FINAL_DIR \
+  --approval APPROVAL.json \
+  --exclude "private_working_notes"
+```
+
+The validator recomputes exclusions from these command-line options. Editing `source_inventory.csv` to label a file as explicitly excluded is not sufficient and is rejected.
+
+Excluded directories are still inventoried recursively using metadata only. Their descendant paths are recorded without reading or hashing file content, which lets the final validator prevent an excluded filename from appearing in the shareable briefing.
+
+The agent must then review every included source, update `read_status`, populate the draft and source map, and record conflicts or limitations. Files requiring readers that are unavailable remain visible as unsupported or unreadable. Never claim that a file type was reviewed merely because the inventory recognised its suffix.
+
+### Complete the approval gate
+
+Before final generation, the agent presents every proposed item with provenance, confidence, wording basis and uncertainty. The researcher can approve, edit, remove, reclassify or add items. Proposed inferred content must remain clearly marked.
+
+After the researcher responds, the agent updates each item and issue, then validates the review set:
+
+```bash
+python3 scripts/folder_mode.py validate-review SOURCE REVIEW_DIR
+```
+
+The command returns a SHA-256 digest bound to the five review artefacts and the current source hashes. Create the approval file privately; do not place it in the source folder, public repository or downloadable Skill:
+
+```json
+{
+  "schema_version": 1,
+  "review_digest": "lowercase-sha256",
+  "approve_finalisation": true,
+  "approved_inferred_item_ids": [],
+  "acknowledged_issue_ids": []
+}
+```
+
+The two arrays must exactly match the inferred items and accepted issues in the final draft. A changed source or review artefact invalidates this approval.
+
+Generate the four final files only after approval:
+
+```bash
+python3 scripts/folder_mode.py finalise SOURCE REVIEW_DIR FINAL_DIR \
+  --approval APPROVAL.json
+```
+
+The output directory contains exactly:
+
+- `final_briefing.html`;
+- `final_briefing_input.json`;
+- `final_source_map.md`; and
+- `final_validation_report.md`.
+
+If the researcher explicitly asks for generation without review, `--allow-unconfirmed` can replace `--approval`. This exceptional route displays an unconfirmed-draft warning, rejects inferred items, presents all retained issues as open for review and records the bypass. Do not make it a local default.
+
+## Customise presentation settings
 
 From the repository root, copy the partial example configuration and edit the copy:
 
@@ -18,38 +124,29 @@ The builder merges a partial configuration with `research-briefing-dashboard/con
 - `theme.accent` and `theme.highlight`: six-digit hexadecimal colours such as `#174f73`.
 - `features.search`, `features.counts`, `features.collapse_controls`, `features.meeting_state` and `features.print`: `true` or `false`.
 
-Unknown keys and invalid values are rejected. Group labels and ordering are presentation choices only; the fields within each group remain fixed.
+Unknown keys and invalid values are rejected. Group labels and ordering are presentation choices only; the fields within each group remain fixed. The Folder Mode Evidence Explorer is generated from approved provenance and remains separate from the four configurable briefing groups.
 
-## Build with or without configuration
+## Customise the Evidence Explorer
 
-Use the default presentation:
+Folder Mode passes a validated evidence sidecar to the stable builder. Each record is bound to an exact final item by identifier and SHA-256 text digest. Routine theme configuration applies to the whole workspace, including the explorer.
 
-```bash
-python3 research-briefing-dashboard/scripts/build_briefing.py \
-  research-briefing-dashboard/examples/meeting_brief.json \
-  /tmp/meeting-brief-default.html
-```
+For deeper changes, edit `research-briefing-dashboard/assets/briefing_template.html` and the corresponding rendering logic in `research-briefing-dashboard/scripts/build_briefing.py` together. Preserve:
 
-Use a presentation override:
+- strict validation of evidence identifiers, hashes and enumerations;
+- relative source paths only;
+- no source excerpts, absolute local paths, or excluded and uncited filename disclosure;
+- separate presentation of open review boundaries, accepted boundaries and resolved issues;
+- content escaping and no external network dependency;
+- a usable no-JavaScript reading order;
+- keyboard navigation, visible focus and mobile layout;
+- print expansion of every briefing and evidence section; and
+- backward compatibility for Structured Mode without an evidence sidecar.
 
-```bash
-python3 research-briefing-dashboard/scripts/build_briefing.py \
-  research-briefing-dashboard/examples/meeting_brief.json \
-  /tmp/meeting-brief-custom.html \
-  --config my-briefing-config.json
-```
-
-Open each output locally and compare every displayed item with its source field before sharing it.
-
-## Make deeper presentation changes
-
-Use configuration for routine labels, ordering, colours and feature switches. For a reusable capability that configuration cannot express, edit `research-briefing-dashboard/assets/briefing_template.html` and the corresponding rendering logic in `research-briefing-dashboard/scripts/build_briefing.py` together. Preserve the required template tokens, strict input validation, offline operation, content escaping, keyboard access, print behaviour and meeting-state validation.
-
-Do not edit a generated briefing to correct content. Correct its source JSON or configuration and rebuild it.
+Do not edit generated HTML to correct research content. Correct the source-grounded review or the structured input and rebuild.
 
 ## Test changes
 
-Run the standard-library test suite from the repository root:
+Run the standard-library tests from the repository root:
 
 ```bash
 python3 -m unittest discover \
@@ -62,26 +159,37 @@ python3 -m unittest discover \
   -v
 ```
 
-Then rebuild both presentations and confirm that the configured output matches the tracked sanitised example:
+Run the real browser interaction suite with Playwright and Chromium available:
+
+```bash
+python3 -m unittest \
+  research-briefing-dashboard/tests/test_browser_interactions.py \
+  -v
+```
+
+A skipped browser test is not sufficient for a release. Verify both Structured and Folder examples through `file://` and a local static server, then inspect wide and approximately 390-pixel views, keyboard operation, search, filters, collapse controls, Evidence Explorer links, meeting-state import and export, print output, console messages and network requests.
+
+Rebuild a configured Structured Mode example and compare it with the tracked output:
 
 ```bash
 tmp_dir="$(mktemp -d)"
 python3 research-briefing-dashboard/scripts/build_briefing.py \
   research-briefing-dashboard/examples/meeting_brief.json \
-  "$tmp_dir/default.html"
-python3 research-briefing-dashboard/scripts/build_briefing.py \
-  research-briefing-dashboard/examples/meeting_brief.json \
   "$tmp_dir/configured.html" \
   --config research-briefing-dashboard/examples/briefing_config.json
-cmp "$tmp_dir/configured.html" research-briefing-dashboard/examples/meeting_brief.html
-python3 scripts/validate_publication.py "$tmp_dir/default.html" "$tmp_dir/configured.html"
+cmp "$tmp_dir/configured.html" \
+  research-briefing-dashboard/examples/meeting_brief.html
 ```
 
-The browser interaction test runs when a suitable local Playwright and Chromium installation is available; otherwise the standard-library suite reports the browser check as skipped.
+Run publication validation after any documentation, example, packaging or website change:
+
+```bash
+python3 scripts/validate_publication.py
+```
 
 ## Rebuild the downloadable ZIP
 
-Rebuild the archive only after the tests and publication validation pass. Start from a clean checkout so caches and exported meeting-state files are absent, then run:
+Rebuild the archive only after tests and publication validation pass:
 
 ```bash
 python3 scripts/package_skill.py
@@ -89,13 +197,14 @@ python3 -m zipfile -t Supervisor_Meeting_HTML_Skill.zip
 python3 scripts/validate_publication.py
 ```
 
-The packaging script creates the archive atomically, includes the standalone MIT and CC BY 4.0 notices, and gives every member a stable timestamp. Inspect the archive inventory before publishing it. It must contain the current Skill source, configuration, tests and sanitised examples, and must not contain confidential inputs, exported meeting state, browser artefacts, caches or private working notes.
+The packager creates the archive atomically with stable member timestamps. Inspect the archive inventory before publication. It must contain only the allow-listed Skill source, configuration, tests, licences and sanitised examples. It must not contain real source material, ad hoc review directories, approval files, final briefings, meeting-state exports, browser artefacts, caches, private paths or quality-assurance notes.
 
 ## Accessibility and confidentiality
 
 - Keep body text at least 16 pixels and interactive targets at least 44 by 44 pixels.
 - Check colour contrast, visible keyboard focus, heading order, labels, narrow-screen layout and print output after changing the template or theme.
-- Do not remove the skip link, semantic controls or reduced-motion support.
-- Treat input JSON, generated HTML and exported meeting-state JSON as potentially confidential.
-- Exported state contains meeting annotations, remains separate from source content and should be stored only in an approved location.
-- Review all content and state before sharing any file.
+- Do not remove the skip link, semantic controls, no-JavaScript fallback or reduced-motion support.
+- Treat source folders, review artefacts, approval JSON, generated HTML and meeting-state exports as potentially confidential.
+- Do not promise that agent-processed source text remains only on the device; it may enter the coding agent's model context.
+- Keep working and final directories private until a researcher has checked their content, paths and evidence boundaries.
+- Approval to generate a briefing is not approval to publish or share it.

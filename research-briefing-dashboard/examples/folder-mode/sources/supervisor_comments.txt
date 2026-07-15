@@ -1,0 +1,3 @@
+Supervisor comment for the synthetic example:
+
+Please distinguish completed document preparation from substantive findings. The comparison paragraph may be useful, but its classification should be confirmed at the meeting.

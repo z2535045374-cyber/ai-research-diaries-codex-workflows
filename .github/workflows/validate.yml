@@ -19,14 +19,37 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the real-browser test runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global @playwright/cli@0.1.14
+          playwright-cli install-browser chromium --with-deps
+          playwright-cli --version
+
       - name: Run standard-library unit tests
         shell: bash
         run: |
           set -euo pipefail
+          browser_log="$(mktemp)"
+          trap 'rm -f "$browser_log"' EXIT
           python3 -m unittest discover \
             -s research-briefing-dashboard/tests \
             -p 'test_*.py' \
-            -v
+            -v 2>&1 | tee "$browser_log"
+          if grep -Eq 'skipped[= ]|Real-browser test skipped' "$browser_log"; then
+            echo "Real-browser validation was skipped." >&2
+            exit 1
+          fi
+          if ! grep -Eq '^Ran [1-9][0-9]* tests?' "$browser_log"; then
+            echo "No executable test result was reported." >&2
+            exit 1
+          fi
           python3 -m unittest discover \
             -s tests \
             -p 'test_*.py' \
@@ -38,7 +61,8 @@ jobs:
           set -euo pipefail
           archive="$(mktemp)"
           extraction="$(mktemp -d)"
-          trap 'rm -f "$archive"; rm -rf "$extraction"' EXIT
+          extracted_log="$(mktemp)"
+          trap 'rm -f "$archive" "$extracted_log"; rm -rf "$extraction"' EXIT
           python3 scripts/package_skill.py "$archive"
           cmp "$archive" Supervisor_Meeting_HTML_Skill.zip
           python3 -m zipfile -t "$archive"
@@ -46,7 +70,11 @@ jobs:
           python3 -m unittest discover \
             -s "$extraction/research-briefing-dashboard/tests" \
             -p 'test_*.py' \
-            -v
+            -v 2>&1 | tee "$extracted_log"
+          if grep -Eq 'skipped[= ]|Real-browser test skipped' "$extracted_log"; then
+            echo "Extracted Skill real-browser validation was skipped." >&2
+            exit 1
+          fi
 
       - name: Rebuild default and configured examples
         shell: bash

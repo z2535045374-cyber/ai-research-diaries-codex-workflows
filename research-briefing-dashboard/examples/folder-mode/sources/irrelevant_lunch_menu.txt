@@ -1,0 +1,1 @@
+This deliberately irrelevant file exists only to test explicit exclusion reporting.

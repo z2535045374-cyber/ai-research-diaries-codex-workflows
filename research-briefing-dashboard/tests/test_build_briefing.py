@@ -18,6 +18,24 @@ from typing import Any
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 BUILDER = SKILL_ROOT / "scripts" / "build_briefing.py"
 DEFAULT_CONFIG = SKILL_ROOT / "config" / "default_config.json"
+LIST_FIELDS = (
+    "recent_progress",
+    "completed_work",
+    "key_findings",
+    "unresolved_questions",
+    "decisions_required",
+    "next_actions",
+    "timeline",
+)
+FIELD_LABELS = {
+    "recent_progress": "Recent progress",
+    "completed_work": "Completed work",
+    "key_findings": "Key findings",
+    "unresolved_questions": "Unresolved questions",
+    "decisions_required": "Decisions required",
+    "next_actions": "Next actions",
+    "timeline": "Timeline",
+}
 
 
 def valid_payload() -> dict[str, Any]:
@@ -77,6 +95,7 @@ class BriefingBuilderTests(unittest.TestCase):
         payload: dict[str, Any] | None = None,
         *,
         config: Any | None = None,
+        evidence: Any | None = None,
         output_name: str = "briefing.html",
     ) -> tuple[subprocess.CompletedProcess[str], Path]:
         input_path = self.write_json("input.json", payload or valid_payload())
@@ -85,6 +104,9 @@ class BriefingBuilderTests(unittest.TestCase):
         if config is not None:
             config_path = self.write_json("config.json", config)
             command.extend(["--config", str(config_path)])
+        if evidence is not None:
+            evidence_path = self.write_json("evidence.json", evidence)
+            command.extend(["--evidence", str(evidence_path)])
         result = subprocess.run(
             command,
             cwd=SKILL_ROOT,
@@ -99,11 +121,13 @@ class BriefingBuilderTests(unittest.TestCase):
         payload: dict[str, Any] | None = None,
         *,
         config: Any | None = None,
+        evidence: Any | None = None,
         output_name: str = "briefing.html",
     ) -> str:
         result, output_path = self.run_builder(
             payload,
             config=config,
+            evidence=evidence,
             output_name=output_name,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -115,14 +139,90 @@ class BriefingBuilderTests(unittest.TestCase):
         *,
         payload: dict[str, Any] | None = None,
         config: Any | None = None,
+        evidence: Any | None = None,
     ) -> None:
         output_path = self.work / "briefing.html"
         output_path.write_text("existing output", encoding="utf-8")
-        result, returned_path = self.run_builder(payload, config=config)
+        result, returned_path = self.run_builder(
+            payload,
+            config=config,
+            evidence=evidence,
+        )
         self.assertEqual(returned_path, output_path)
         self.assertEqual(result.returncode, 2, result.stderr)
         self.assertIn("error", result.stderr.lower())
         self.assertEqual(output_path.read_text(encoding="utf-8"), "existing output")
+
+    def valid_evidence(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        content = payload or valid_payload()
+        brief_id = hashlib.sha256(
+            json.dumps(
+                content,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        source = {
+            "source_id": "source-001",
+            "display_path": "notes/progress_note.md",
+            "file_type": "Markdown",
+            "modified_at": "2026-07-14",
+            "version_status": "current",
+            "read_status": "read",
+        }
+        items: dict[str, Any] = {
+            "project_title": {
+                "wording_basis": "conservatively_summarised",
+                "confidence": "high",
+                "explicitly_approved": True,
+                "text_sha256": hashlib.sha256(
+                    content["project_title"].encode("utf-8")
+                ).hexdigest(),
+                "references": [
+                    {
+                        "source_id": "source-001",
+                        "location": "heading: Project title",
+                        "relevant_date": "2026-07-14",
+                    }
+                ],
+            }
+        }
+        for field in LIST_FIELDS:
+            for index, item_text in enumerate(content[field], start=1):
+                items[f"{field}-{index}"] = {
+                    "wording_basis": "directly_stated",
+                    "confidence": "high",
+                    "explicitly_approved": True,
+                    "text_sha256": hashlib.sha256(
+                        item_text.encode("utf-8")
+                    ).hexdigest(),
+                    "references": [
+                        {
+                            "source_id": "source-001",
+                            "location": f"heading: {FIELD_LABELS[field]}",
+                            "relevant_date": "2026-07-14",
+                        }
+                    ],
+                }
+        return {
+            "schema_version": 1,
+            "brief_id": brief_id,
+            "review_status": "approved",
+            "sources": [source],
+            "items": items,
+            "issues": [
+                {
+                    "issue_id": "issue-001",
+                    "type": "classification_uncertainty",
+                    "description": "The researcher retained one classification boundary.",
+                    "status": "accepted",
+                    "resolution": "Discuss the boundary with supervisors.",
+                    "item_ids": ["unresolved_questions-1"],
+                    "source_ids": ["source-001"],
+                }
+            ],
+        }
 
     def test_legacy_two_positional_argument_command_still_builds(self) -> None:
         result, output_path = self.run_builder()
@@ -570,6 +670,27 @@ class BriefingBuilderTests(unittest.TestCase):
         self.assertNotIn("localStorage", generated)
         self.assertNotIn("sessionStorage", generated)
         self.assertNotRegex(generated, re.compile(r"\{\{[A-Z0-9_]+\}\}"))
+        self.assertFalse(
+            any(line.rstrip() != line for line in generated.splitlines()),
+            "Generated HTML must not contain trailing whitespace",
+        )
+
+    def test_multiline_research_text_preserves_trailing_whitespace_exactly(self) -> None:
+        payload = valid_payload()
+        supplied = "Markdown hard break  \nTabbed spacing\t \nFinal line"
+        payload["recent_progress"] = [supplied]
+
+        generated = self.build_html(payload)
+
+        self.assertIn(html.escape(supplied, quote=True), generated)
+
+    def test_optional_evidence_markup_does_not_leave_indentation_only_lines(self) -> None:
+        generated = self.build_html(evidence=self.valid_evidence())
+
+        self.assertFalse(
+            any(line.rstrip() != line for line in generated.splitlines()),
+            "Optional evidence markup must not leave trailing whitespace",
+        )
 
     def test_meeting_state_contract_constants_ids_and_atomic_apply_are_embedded(self) -> None:
         payload = valid_payload()
@@ -623,6 +744,270 @@ class BriefingBuilderTests(unittest.TestCase):
         self.assertIn("@media print", generated)
         self.assertIn(".workspace-navigation", generated)
         self.assertIn("display: none", generated)
+
+    def test_optional_evidence_manifest_renders_linked_explorer(self) -> None:
+        evidence = self.valid_evidence()
+
+        generated = self.build_html(evidence=evidence)
+
+        self.assertEqual(generated.count('<details class="workspace-group"'), 5)
+        self.assertIn('id="group-evidence"', generated)
+        self.assertIn("page-break-inside: avoid;", generated)
+        self.assertIn(".evidence-sources > summary::marker", generated)
+        self.assertIn("break-after: avoid;", generated)
+        self.assertIn("Evidence Explorer", generated)
+        self.assertIn("Evidence sources", generated)
+        self.assertIn("Filter evidence", generated)
+        self.assertIn('id="evidence-category-filter"', generated)
+        self.assertIn('id="evidence-source-filter"', generated)
+        self.assertIn('id="evidence-confidence-filter"', generated)
+        self.assertIn('id="evidence-basis-filter"', generated)
+        self.assertIn('id="evidence-uncertainties-only"', generated)
+        self.assertIn('class="evidence-link"', generated)
+        self.assertIn("View evidence", generated)
+        self.assertIn("notes/progress_note.md", generated)
+        self.assertIn("Conservatively summarised", generated)
+        self.assertIn("Accepted evidence boundaries", generated)
+        self.assertIn("aria-live=\"polite\"", generated)
+        self.assertIn('class="evidence-statusline"', generated)
+        self.assertIn("Source-grounded review", generated)
+        self.assertIn("8 briefing items", generated)
+        self.assertIn("1 source", generated)
+        self.assertNotIn('<details class="evidence-sources" open>', generated)
+        self.assertNotIn("source excerpt", generated.lower())
+
+    def test_evidence_manifest_cannot_change_content_or_reference_unknown_records(self) -> None:
+        cases: dict[str, tuple[Any, str]] = {}
+
+        wrong_brief = self.valid_evidence()
+        wrong_brief["brief_id"] = "0" * 64
+        cases["brief ID"] = (wrong_brief, "brief_id")
+
+        unknown_item = self.valid_evidence()
+        unknown_item["items"]["key_findings-99"] = unknown_item["items"].pop(
+            "key_findings-1"
+        )
+        cases["unknown item"] = (unknown_item, "item")
+
+        unknown_source = self.valid_evidence()
+        unknown_source["items"]["key_findings-1"]["references"][0][
+            "source_id"
+        ] = "source-999"
+        cases["unknown source"] = (unknown_source, "source")
+
+        content_override = self.valid_evidence()
+        content_override["items"]["key_findings-1"]["text"] = "Replacement claim"
+        cases["content override"] = (content_override, "unknown key")
+
+        absolute_path = self.valid_evidence()
+        absolute_path["sources"][0]["display_path"] = (
+            "/" + "Users/synthetic-person/private.md"
+        )
+        cases["absolute path"] = (absolute_path, "relative")
+
+        absolute_location = self.valid_evidence()
+        absolute_location["items"]["recent_progress-1"]["references"][0][
+            "location"
+        ] = "/Volumes/SecretDrive/private/progress.md"
+        cases["absolute evidence location"] = (absolute_location, "local path")
+
+        local_modified_date = self.valid_evidence()
+        local_modified_date["sources"][0]["modified_at"] = (
+            "/Volumes/SyntheticDrive/private/progress.md"
+        )
+        cases["local path in modified date"] = (local_modified_date, "modified_at")
+
+        unapproved_inference = self.valid_evidence()
+        unapproved_inference["items"]["key_findings-1"][
+            "wording_basis"
+        ] = "inferred"
+        unapproved_inference["items"]["key_findings-1"][
+            "explicitly_approved"
+        ] = False
+        cases["unapproved inference"] = (unapproved_inference, "inferred")
+
+        open_issue_in_approved_manifest = self.valid_evidence()
+        open_issue_in_approved_manifest["issues"][0]["status"] = "open"
+        cases["open issue in approved manifest"] = (
+            open_issue_in_approved_manifest,
+            "open",
+        )
+
+        for label, (evidence, expected_error) in cases.items():
+            with self.subTest(label=label):
+                self.assert_rejected_without_output_change(evidence=evidence)
+                result, _ = self.run_builder(evidence=evidence)
+                self.assertIn(expected_error, result.stderr.lower())
+
+    def test_evidence_metadata_rejects_all_absolute_local_path_forms_atomically(self) -> None:
+        cases: dict[str, dict[str, Any]] = {}
+
+        posix_file_type = self.valid_evidence()
+        posix_file_type["sources"][0]["file_type"] = "/mnt/private/format.txt"
+        cases["POSIX path in source file type"] = posix_file_type
+
+        posix_location = self.valid_evidence()
+        posix_location["items"]["recent_progress-1"]["references"][0][
+            "location"
+        ] = "/srv/restricted/progress.md"
+        cases["POSIX path in evidence location"] = posix_location
+
+        posix_relevant_date = self.valid_evidence()
+        posix_relevant_date["items"]["recent_progress-1"]["references"][0][
+            "relevant_date"
+        ] = "/data/private/dates.txt"
+        cases["POSIX path in relevant date"] = posix_relevant_date
+
+        windows_issue = self.valid_evidence()
+        windows_issue["issues"][0]["description"] = (
+            "Review C:\\Research\\private\\comments.docx before sharing."
+        )
+        cases["Windows path in issue description"] = windows_issue
+
+        file_url_issue = self.valid_evidence()
+        file_url_issue["issues"][0]["resolution"] = (
+            "See " + "file://" + "/" + "Users/example/private/decision.txt"
+        )
+        cases["file URL in issue resolution"] = file_url_issue
+
+        unc_issue = self.valid_evidence()
+        unc_issue["issues"][0]["description"] = (
+            r"Review \\server\share\private\comments.docx before sharing."
+        )
+        cases["UNC path in issue description"] = unc_issue
+
+        home_relative_issue = self.valid_evidence()
+        home_relative_issue["issues"][0]["resolution"] = (
+            "See ~/Research/private/decision.txt"
+        )
+        cases["home-relative path in issue resolution"] = home_relative_issue
+
+        named_home_issue = self.valid_evidence()
+        named_home_issue["issues"][0]["resolution"] = (
+            "See ~alice/private/decision.txt"
+        )
+        cases["named home path in issue resolution"] = named_home_issue
+
+        standalone_named_home_issue = self.valid_evidence()
+        standalone_named_home_issue["issues"][0]["resolution"] = (
+            "The private working directory belongs to ~alice"
+        )
+        cases["standalone named home in issue resolution"] = (
+            standalone_named_home_issue
+        )
+
+        colon_prefixed_posix = self.valid_evidence()
+        colon_prefixed_posix["issues"][0]["description"] = (
+            "Path:/mnt/private/results.csv"
+        )
+        cases["colon-prefixed POSIX path"] = colon_prefixed_posix
+
+        posix_network_path = self.valid_evidence()
+        posix_network_path["issues"][0]["resolution"] = (
+            "See //private-server/research/results.csv"
+        )
+        cases["POSIX network path"] = posix_network_path
+
+        for label, evidence in cases.items():
+            with self.subTest(label=label):
+                self.assert_rejected_without_output_change(evidence=evidence)
+                result, _ = self.run_builder(evidence=evidence)
+                self.assertIn("local path or file url", result.stderr.lower())
+
+    def test_evidence_metadata_rejects_network_file_uris_atomically(self) -> None:
+        for scheme in ("smb", "afp", "nfs", "sshfs", "sftp"):
+            with self.subTest(scheme=scheme):
+                evidence = self.valid_evidence()
+                evidence["issues"][0]["resolution"] = (
+                    f"See {scheme}://private-server/research/results.csv"
+                )
+
+                self.assert_rejected_without_output_change(evidence=evidence)
+                result, _ = self.run_builder(evidence=evidence)
+                self.assertIn("local path or file url", result.stderr.lower())
+
+    def test_safe_metadata_path_detection_does_not_reject_public_or_relative_notation(self) -> None:
+        evidence = self.valid_evidence()
+        evidence["sources"][0]["file_type"] = "analysis/input"
+        evidence["items"]["recent_progress-1"]["references"][0]["location"] = (
+            "https://example.org/analysis/input"
+        )
+        evidence["issues"][0]["description"] = (
+            "DOI: 10.1234/example.2026.001"
+        )
+        evidence["issues"][0]["resolution"] = "中文研究/方法"
+        evidence["issues"][0]["resolution"] = (
+            "中文研究/方法; an estimate of ~5 files was reviewed."
+        )
+
+        generated = self.build_html(evidence=evidence)
+
+        for supplied in (
+            "analysis/input",
+            "https://example.org/analysis/input",
+            "DOI: 10.1234/example.2026.001",
+            "中文研究/方法; an estimate of ~5 files was reviewed.",
+        ):
+            self.assertIn(html.escape(supplied, quote=True), generated)
+
+    def test_unconfirmed_manifest_rejects_confirmed_issue_statuses_atomically(self) -> None:
+        for status in ("accepted", "resolved"):
+            with self.subTest(status=status):
+                evidence = self.valid_evidence()
+                evidence["review_status"] = "automatic_unconfirmed"
+                evidence["issues"][0]["status"] = status
+
+                self.assert_rejected_without_output_change(evidence=evidence)
+                result, _ = self.run_builder(evidence=evidence)
+                self.assertIn("automatic_unconfirmed", result.stderr)
+                self.assertIn("open", result.stderr)
+
+    def test_resolved_issue_has_independent_metric_tag_heading_and_filter_semantics(self) -> None:
+        evidence = self.valid_evidence()
+        evidence["issues"][0]["status"] = "resolved"
+        evidence["issues"][0]["resolution"] = (
+            "The researcher confirmed the classification."
+        )
+
+        generated = self.build_html(evidence=evidence)
+
+        self.assertIn("Resolved issues", generated)
+        self.assertIn("Resolved evidence issues", generated)
+        self.assertIn('<span class="uncertainty-tag">Resolved issue</span>', generated)
+        self.assertIn(
+            'id="evidence-item-unresolved_questions-1" tabindex="-1" '
+            'data-evidence-record data-category="unresolved_questions"',
+            generated,
+        )
+        record_start = generated.index(
+            'id="evidence-item-unresolved_questions-1"'
+        )
+        record_end = generated.index("</article>", record_start)
+        resolved_record = generated[record_start:record_end]
+        self.assertIn('data-uncertain="false"', resolved_record)
+        self.assertNotIn("Accepted boundary", generated)
+        self.assertNotIn("Accepted boundaries", generated)
+        self.assertNotIn("Accepted evidence boundaries", generated)
+
+    def test_evidence_manifest_requires_complete_provenance_and_escapes_metadata(self) -> None:
+        incomplete = self.valid_evidence()
+        del incomplete["items"]["timeline-1"]
+        self.assert_rejected_without_output_change(evidence=incomplete)
+
+        malicious = self.valid_evidence()
+        malicious["sources"][0]["display_path"] = "notes/<script>alert(1)</script>.md"
+        malicious["items"]["recent_progress-1"]["references"][0][
+            "location"
+        ] = '<img src=x onerror="alert(1)">'
+        malicious["issues"][0]["description"] = "<strong>Boundary</strong>"
+        generated = self.build_html(evidence=malicious)
+
+        self.assertNotIn("<script>alert(1)</script>", generated)
+        self.assertNotIn("<img src=x", generated)
+        self.assertNotIn("<strong>Boundary</strong>", generated)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", generated)
+        self.assertIn("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;", generated)
+        self.assertIn("&lt;strong&gt;Boundary&lt;/strong&gt;", generated)
 
     def test_cli_rejects_malformed_optional_arguments_without_touching_output(self) -> None:
         input_path = self.write_json("input.json", valid_payload())

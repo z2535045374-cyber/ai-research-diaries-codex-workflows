@@ -1,4 +1,4 @@
 interface:
-  display_name: "Supervisor Meeting Workspace"
-  short_description: "Build confidential offline meeting workspaces"
-  default_prompt: "Use $research-briefing-dashboard to turn my approved research meeting notes into a confidential offline supervisor meeting workspace."
+  display_name: "Research Supervision Workspace"
+  short_description: "Build source-grounded offline meeting workspaces"
+  default_prompt: "Use $research-briefing-dashboard in Folder Mode to review this project, show me a sourced draft and wait for approval before generating the offline workspace."
